@@ -6,7 +6,7 @@ MD5 `ef4954015d8b67e3534c9dc40ca3ad6e`). The goal is C source that rebuilds a **
 
 ## Status
 
-3267 functions reimplemented: 2862 byte-exact, 405 not yet byte-exact (per-function list: `Rayman2.exe/status.json`).
+3267 functions reimplemented: 2853 byte-exact, 414 not yet byte-exact (per-function list: `Rayman2.exe/status.json`).
 
 The full program builds, links and runs. It is not yet byte-identical to retail.
 

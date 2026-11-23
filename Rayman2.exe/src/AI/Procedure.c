@@ -5066,7 +5066,7 @@ extern void __cdecl fn_vGetFieldTypeVector(void);          /* 0x00403290 */
 extern short *__cdecl HIE_pc_fn_p_stCreateFrameTable(short sCount);
 extern unsigned long *__cdecl HIE_pc_fn_pulSetFrameTableEntry(void *p_stTable, short sIndex, long lCount);
 extern unsigned long __cdecl HIE_pc_fn_ulGetFrameTableEntry(void *p_stTable, short sIndex);
-extern long __cdecl HIE_pc_fn_lGetFrameTableEntryCount(void *p_stTable, short sIndex);
+extern short __cdecl HIE_pc_fn_sGetFrameTableEntryCount(void *p_stTable, short sIndex);
 extern void __cdecl HIE_pc_fn_vStoreScaledShortRecords(short *psDst, const float *pfSrc, long lCount);
 
 /* 0x004B9C78 */
@@ -5122,7 +5122,7 @@ void __cdecl AI_pc_fn_vLightWalkNode(unsigned char *p_ucNode)
             {
                 GLI_vGetVisualSetLOD((void *)lVisualSet, lIndex, &xThreshold, &hObject);
                 fn_vGetFieldTypeVector();
-                sIndex = (short)HIE_pc_fn_lGetFrameTableEntryCount(psTable, (short)lIndex);
+                sIndex = HIE_pc_fn_sGetFrameTableEntryCount(psTable, (short)lIndex);
                 ulEntry = HIE_pc_fn_ulGetFrameTableEntry(psTable, (short)lIndex);
                 HIE_pc_fn_vStoreScaledShortRecords((short *)ulEntry, AI_pc_xLightSourceRecord, (long)sIndex);
                 lIndex++;

@@ -1570,169 +1570,94 @@ __declspec(naked) void __cdecl GLI_FillProgressBarSpan(
 }
 
 /* 0x0045f420 */
-__declspec(naked) void __cdecl GLI_DrawProgressBarFrameAndFill(int ui_object)
+void __cdecl GLI_DrawProgressBarFrameAndFill(int ui_object)
 {
-    __asm {
-        mov  eax, dword ptr [GLI_AA_ProgressBarDivisor]  /* 0x00516640 */
-        push ebx
-        push ebp
-        push esi
-        test eax, eax
-        push edi
-        jnz  skip_init
-        mov  dword ptr [GLI_AA_ProgressBarDivisor], 0x64
-    skip_init:
-        mov  esi, dword ptr [esp + 0x14]
-        mov  ebx, dword ptr [esi + 0x274]
-        mov  eax, dword ptr [esi + 0x27c]
-        cmp  ebx, eax
-        ja   skip_fill
-    fill_row:
-        mov  edi, dword ptr [esi + 0x270]
-        mov  eax, dword ptr [esi + 0x278]
-        cmp  edi, eax
-        ja   fill_row_done
-        lea  ebp, [esi + 0x290]
-    fill_pixel:
-        push ebp
-        push ebx
-        push edi
-        push esi
-        call GLI_BlendPixelIntoUiSurface
-        mov  eax, dword ptr [esi + 0x278]
-        add  esp, 0x10
-        inc  edi
-        cmp  edi, eax
-        jbe  fill_pixel
-    fill_row_done:
-        mov  eax, dword ptr [esi + 0x27c]
-        inc  ebx
-        cmp  ebx, eax
-        jbe  fill_row
-    skip_fill:
-        mov  edi, dword ptr [esi + 0x270]
-        mov  eax, dword ptr [esi + 0x278]
-        inc  edi
-        dec  eax
-        cmp  edi, eax
-        ja   skip_hborder
-        lea  ebx, [esi + 0x280]
-    hborder_col:
-        mov  ecx, dword ptr [esi + 0x274]
-        push ebx
-        push ecx
-        push edi
-        push esi
-        call GLI_BlendPixelIntoUiSurface
-        mov  edx, dword ptr [esi + 0x27c]
-        add  esp, 0x10
-        push ebx
-        push edx
-        push edi
-        push esi
-        call GLI_BlendPixelIntoUiSurface
-        mov  eax, dword ptr [esi + 0x278]
-        add  esp, 0x10
-        inc  edi
-        dec  eax
-        cmp  edi, eax
-        jbe  hborder_col
-    skip_hborder:
-        mov  edi, dword ptr [esi + 0x274]
-        mov  eax, dword ptr [esi + 0x27c]
-        cmp  edi, eax
-        ja   skip_vborder
-        lea  ebx, [esi + 0x280]
-    vborder_row:
-        mov  ecx, dword ptr [esi + 0x270]
-        push ebx
-        push edi
-        push ecx
-        push esi
-        call GLI_BlendPixelIntoUiSurface
-        mov  edx, dword ptr [esi + 0x278]
-        add  esp, 0x10
-        push ebx
-        push edi
-        push edx
-        push esi
-        call GLI_BlendPixelIntoUiSurface
-        mov  eax, dword ptr [esi + 0x27c]
-        add  esp, 0x10
-        inc  edi
-        cmp  edi, eax
-        jbe  vborder_row
-    skip_vborder:
-        mov  eax, dword ptr [GLI_AA_ProgressBarCurPos]  /* 0x0051664c */
-        push eax
-        push 0
-        push GLI_AA_ProgressUiObject
-        call GLI_FillProgressBarSpan
-        add  esp, 0x0c
-        pop  edi
-        pop  esi
-        pop  ebp
-        pop  ebx
-        ret
+    GLI_pc_tdstProgressUi *p_stUi;
+    float *p_xBlend;
+    unsigned long ulX;
+    unsigned long ulY;
+    unsigned long ulXEnd;
+    unsigned long ulYEnd;
+    long lYTop;
+    long lYBottom;
+
+    if (GLI_pc_g_lProgressBarDivisor == 0) {
+        GLI_pc_g_lProgressBarDivisor = 100;
     }
+    p_stUi = (GLI_pc_tdstProgressUi *)ui_object;
+    ulY = (unsigned long)p_stUi->lBarYStart;
+    ulYEnd = (unsigned long)p_stUi->lBarYEnd;
+    if (ulY <= ulYEnd) {
+        do {
+            ulX = (unsigned long)p_stUi->lBarXStart;
+            ulXEnd = (unsigned long)p_stUi->lBarXEnd;
+            if (ulX <= ulXEnd) {
+                p_xBlend = p_stUi->a_xBackgroundBlend;
+                do {
+                    GLI_BlendPixelIntoUiSurface(ui_object, (int)ulX, (int)ulY, p_xBlend);
+                    ulXEnd = (unsigned long)p_stUi->lBarXEnd;
+                    ulX++;
+                } while (ulX <= ulXEnd);
+            }
+            ulYEnd = (unsigned long)p_stUi->lBarYEnd;
+            ulY++;
+        } while (ulY <= ulYEnd);
+    }
+    ulX = (unsigned long)p_stUi->lBarXStart + 1;
+    ulXEnd = (unsigned long)p_stUi->lBarXEnd - 1;
+    if (ulX <= ulXEnd) {
+        p_xBlend = p_stUi->a_xBorderBlend;
+        do {
+            lYTop = p_stUi->lBarYStart;
+            GLI_BlendPixelIntoUiSurface(ui_object, (int)ulX, lYTop, p_xBlend);
+            lYBottom = p_stUi->lBarYEnd;
+            GLI_BlendPixelIntoUiSurface(ui_object, (int)ulX, lYBottom, p_xBlend);
+            ulXEnd = (unsigned long)p_stUi->lBarXEnd - 1;
+            ulX++;
+        } while (ulX <= ulXEnd);
+    }
+    ulY = (unsigned long)p_stUi->lBarYStart;
+    ulYEnd = (unsigned long)p_stUi->lBarYEnd;
+    if (ulY <= ulYEnd) {
+        p_xBlend = p_stUi->a_xBorderBlend;
+        do {
+            lYTop = p_stUi->lBarXStart;
+            GLI_BlendPixelIntoUiSurface(ui_object, lYTop, (int)ulY, p_xBlend);
+            lYBottom = p_stUi->lBarXEnd;
+            GLI_BlendPixelIntoUiSurface(ui_object, lYBottom, (int)ulY, p_xBlend);
+            ulYEnd = (unsigned long)p_stUi->lBarYEnd;
+            ulY++;
+        } while (ulY <= ulYEnd);
+    }
+    GLI_FillProgressBarSpan((int)&GLI_pc_g_stProgressUi, 0, GLI_pc_g_lProgressBarCurPos);
 }
 
 /* 0x0045f7e0 */
-__declspec(naked) unsigned int __cdecl GLI_AddToProgressBar(int lIncrement)
+unsigned int __cdecl GLI_AddToProgressBar(int lIncrement)
 {
-    __asm {
-        mov  edx, dword ptr [GLI_AA_ProgressBarStart]
-        mov  al,  byte ptr [GLI_AA_ProgressBarEnabled]
-        push ebx
-        push esi
-        mov  esi, dword ptr [GLI_AA_ProgressBarEnd]
-        push edi
-        sub  esi, edx
-        sub  esi, 3
-        test al, al
-        jz   ap_exit
+    unsigned long ulStart;
+    unsigned char ucEnabled;
+    unsigned long ulSpan;
+    unsigned long ulAccum;
+    unsigned long ulNewPos;
+    unsigned long ulLastPos;
 
-        mov  ecx, dword ptr [GLI_AA_ProgressBarAccum]
-        mov  edx, dword ptr [esp + 0x10]
-        add  ecx, edx
-        mov  eax, esi
-        imul eax, ecx
-        xor  edx, edx
-        mov  edi, dword ptr [GLI_AA_ProgressBarLastPos]
-        div  dword ptr [GLI_AA_ProgressBarDivisor]
-        mov  dword ptr [GLI_AA_ProgressBarAccum], ecx
-        mov  ecx, eax
-        cmp  ecx, edi
-        mov  dword ptr [GLI_AA_ProgressBarCurPos], ecx
-        jbe  ap_exit
-
-        mov  eax, 0xcccccccd
-        mov  ebx, ecx
-        mul  esi
-        shr  edx, 3
-        mov  eax, 0xcccccccd
-        sub  ebx, edi
-        mul  edx
-        shr  edx, 2
-        cmp  ebx, edx
-        jbe  ap_exit
-
-        push ecx
-        push edi
-        push GLI_AA_ProgressUiObject
-        call GLI_FillProgressBarSpan
-        add  esp, 0x0c
-        push GLI_AA_ProgressUiObject
-        call GLI_RefreshUiSurfaceIfVisible
-        mov  eax, dword ptr [GLI_AA_ProgressBarCurPos]
-        add  esp, 0x4
-        mov  dword ptr [GLI_AA_ProgressBarLastPos], eax
-    ap_exit:
-        pop  edi
-        pop  esi
-        pop  ebx
-        ret
+    ulStart = GLI_pc_g_lProgressBarStart;
+    ucEnabled = GLI_pc_g_bProgressBarEnabled;
+    ulSpan = GLI_pc_g_lProgressBarEnd - ulStart - 3;
+    if (ucEnabled != 0) {
+        ulLastPos = GLI_pc_g_lProgressBarLastPos;
+        ulAccum = GLI_pc_g_lProgressBarAccum + (unsigned long)lIncrement;
+        ulNewPos = (ulSpan * ulAccum) / GLI_pc_g_lProgressBarDivisor;
+        GLI_pc_g_lProgressBarAccum = ulAccum;
+        GLI_pc_g_lProgressBarCurPos = ulNewPos;
+        if (ulNewPos > ulLastPos && ulNewPos - ulLastPos > (ulSpan / 10) / 5) {
+            GLI_FillProgressBarSpan((int)&GLI_pc_g_stProgressUi, ulLastPos, ulNewPos);
+            GLI_RefreshUiSurfaceIfVisible((char *)&GLI_pc_g_stProgressUi);
+            GLI_pc_g_lProgressBarLastPos = GLI_pc_g_lProgressBarCurPos;
+        }
     }
+    return ulNewPos;
 }
 
 /* 0x00421fd0 */
@@ -1744,124 +1669,49 @@ void __cdecl GLI_pc_fn_vWrite16bBitmapToBackBuffer(void *p_vBuffer, long lPitch,
 }
 
 /* 0x0045eed0 */
-__declspec(naked) void __cdecl GLI_RefreshUiSurfaceIfVisible(char *ui_object)
+void __cdecl GLI_RefreshUiSurfaceIfVisible(char *ui_object)
 {
-    __asm {
-        sub  esp, 0x70
-        push esi
-        mov  esi, dword ptr [esp + 0x78]
-        push GLI_AA_ProgressUiObject
-        push esi
-        call _stricmp                         /* 0x5163e0 */
-        add  esp, 8
-        test eax, eax
-        jz   skip_self_refresh
-        mov  eax, dword ptr [esi + 0x218]
-        push eax
-        push esi
-        push esi
-        call FUN_0045fbf0
-        add  esp, 0x0c
-    skip_self_refresh:
-        mov  al,  byte ptr [esi + 0x25c]
-        test al,  al
-        jz   refresh_exit
-        mov  ecx, dword ptr [esi + 0x26c]
-        mov  eax, dword ptr [esi + 0x268]
-        cmp  ecx, eax
-        jbe  refresh_exit
+    unsigned long a_ulViewAttr[0x1c];
+    GLI_pc_tdstProgressUi *p_stUi;
+    unsigned long ulCurPos;
+    unsigned long ulLastPos;
+    void *hSemaphore;
 
-        mov  edx, dword ptr [GLI_AA_hOverlaySemaphore]
-        push -1
-        push edx
-        call dword ptr [WaitForSingleObject]
-        mov  cx,  word ptr [GLI_AA_uwOverlayHeight]
-        mov  dx,  word ptr [GLI_AA_uwOverlayWidth]
-        lea  eax, [esp + 0x4]
-        push eax
-        push ecx
-        push edx
-        call GLD_bGetViewportAttributes
-        mov  eax, dword ptr [esp + 0x34]
-        mov  ecx, dword ptr [esp + 0x3c]
-        mov  edx, dword ptr [esp + 0x30]
-        add  esp, 0x0c
-        push eax
-        mov  eax, dword ptr [esp + 0x30]
-        push ecx
-        mov  ecx, dword ptr [esi + 0x214]
-        push edx
-        mov  edx, dword ptr [esi + 0x210]
-        push eax
-        mov  eax, dword ptr [esi + 0x20c]
-        push ecx
-        push edx
-        push eax
-        call GLI_pc_fn_vWrite16bBitmapToBackBuffer
-        mov  cx,  word ptr [GLI_AA_uwOverlayWidth]
-        add  esp, 0x1c
-        push 0xff
-        push ecx
-        call GLD_bFlipDeviceWithSynchro       /* 0x420F50 */
-        mov  edx, dword ptr [GLI_AA_hOverlaySemaphore]
-        add  esp, 8
-        push 0
-        push 1
-        push edx
-        call dword ptr [ReleaseSemaphore]
-    refresh_exit:
-        pop  esi
-        add  esp, 0x70
-        ret
+    p_stUi = (GLI_pc_tdstProgressUi *)ui_object;
+    if (_stricmp(ui_object, (char *)&GLI_pc_g_stProgressUi) != 0) {
+        FUN_0045fbf0(ui_object, ui_object, p_stUi->lFormatKind);
     }
+    if (p_stUi->ucProgressBarEnabled == 0) {
+        return;
+    }
+    ulCurPos = p_stUi->ulProgressBarCurPos;
+    ulLastPos = p_stUi->ulProgressBarLastPos;
+    if (ulCurPos <= ulLastPos) {
+        return;
+    }
+    hSemaphore = GLI_pc_g_hOverlaySemaphore;
+    WaitForSingleObject(hSemaphore, INFINITE);
+    GLD_bGetViewportAttributes(GLI_pc_g_uwOverlayDevice, GLI_pc_g_uwOverlayViewport, a_ulViewAttr);
+    GLI_pc_fn_vWrite16bBitmapToBackBuffer(p_stUi->p_vBuffer, p_stUi->lBufferDimC, p_stUi->lBufferDim8,
+                                          (long)a_ulViewAttr[0xa], (long)a_ulViewAttr[8],
+                                          (long)a_ulViewAttr[0xb], (long)a_ulViewAttr[9]);
+    GLD_bFlipDeviceWithSynchro(GLI_pc_g_uwOverlayDevice, 0xff);
+    hSemaphore = GLI_pc_g_hOverlaySemaphore;
+    ReleaseSemaphore(hSemaphore, 1, NULL);
 }
 
 /* 0x0045efb0 */
-__declspec(naked) void __cdecl GLI_RefreshUiSurfaceUnsynchronized(char *ui_object)
+void __cdecl GLI_RefreshUiSurfaceUnsynchronized(char *ui_object)
 {
-    __asm {
-        sub  esp, 0x70
-        push esi
-        mov  esi, dword ptr [esp + 0x78]
-        push GLI_AA_ProgressUiObject
-        push esi
-        call _stricmp                         /* 0x5163e0 */
-        add  esp, 8
-        test eax, eax
-        jz   skip_self_refresh
-        mov  eax, dword ptr [esi + 0x218]
-        push eax
-        push esi
-        push esi
-        call FUN_0045fbf0
-        add  esp, 0x0c
-    skip_self_refresh:
-        mov  dx,  word ptr [GLI_pc_g_uwOverlayViewport]
-        mov  ax,  word ptr [GLI_pc_g_uwOverlayDevice]
-        lea  ecx, [esp + 0x4]
-        push ecx
-        push edx
-        push eax
-        call GLD_bGetViewportAttributes
-        mov  ecx, dword ptr [esp + 0x34]
-        mov  edx, dword ptr [esp + 0x3c]
-        mov  eax, dword ptr [esp + 0x30]
-        add  esp, 0x0c
-        push ecx
-        mov  ecx, dword ptr [esp + 0x30]
-        push edx
-        mov  edx, dword ptr [esi + 0x214]
-        push eax
-        mov  eax, dword ptr [esi + 0x210]
-        push ecx
-        mov  ecx, dword ptr [esi + 0x20c]
-        push edx
-        push eax
-        push ecx
-        call GLI_pc_fn_vWrite16bBitmapToBackBuffer
-        add  esp, 0x1c
-        pop  esi
-        add  esp, 0x70
-        ret
+    unsigned long a_ulViewAttr[0x1c];
+    GLI_pc_tdstProgressUi *p_stUi;
+
+    p_stUi = (GLI_pc_tdstProgressUi *)ui_object;
+    if (_stricmp(ui_object, (char *)&GLI_pc_g_stProgressUi) != 0) {
+        FUN_0045fbf0(ui_object, ui_object, p_stUi->lFormatKind);
     }
+    GLD_bGetViewportAttributes(GLI_pc_g_uwOverlayDevice, GLI_pc_g_uwOverlayViewport, a_ulViewAttr);
+    GLI_pc_fn_vWrite16bBitmapToBackBuffer(p_stUi->p_vBuffer, p_stUi->lBufferDimC, p_stUi->lBufferDim8,
+                                          (long)a_ulViewAttr[0xa], (long)a_ulViewAttr[8],
+                                          (long)a_ulViewAttr[0xb], (long)a_ulViewAttr[9]);
 }
