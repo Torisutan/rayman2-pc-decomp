@@ -1030,542 +1030,212 @@ void __cdecl GLI_xLoadTextureInTexelField(void *p_stTexture,
 }
 
 /* 0x0045f030 */
-extern long __cdecl _ftol(void);
-
-__declspec(naked) void __cdecl GLI_BlendPixelIntoUiSurface(
-    int p_stUiObject, int x, int y, float *p_xBlendDesc)
+void __cdecl GLI_BlendPixelIntoUiSurface(int p_stUiObject,
+                                         int x,
+                                         int y,
+                                         float *p_xBlendDesc)
 {
-    __asm {
-        /* 0x0045f030 */
-        sub  esp, 0x18
-        push ebx
-        mov  ebx, dword ptr [esp + 0x24]
-        push ebp
-        push esi
-        test ebx, ebx
-        push edi
-        jl   ret_path
-        mov  esi, dword ptr [esp + 0x2c]
-        mov  ecx, dword ptr [esi + 0x210]
-        cmp  ebx, ecx
-        jge  ret_path
-        mov  edi, dword ptr [esp + 0x34]
-        test edi, edi
-        jl   ret_path
-        cmp  edi, dword ptr [esi + 0x214]
-        jge  ret_path
+    GLI_pc_tdstProgressUi *p_stUi;
+    GLD_tdstPixelFormat   *p_stPf;
+    unsigned char         *pucBuf;
+    unsigned char         *pucPix;
+    unsigned short        *pusPix;
+    unsigned long          ulIdx;
+    unsigned long          ulPix;
+    unsigned long          ulOut;
+    long                   lWidth;
+    long                   lFormat;
+    long                   lOld;
+    long                   lT1;
+    long                   lG8;
+    long                   lB8;
+    unsigned char          ucTerm0;
+    unsigned char          ucTerm1;
+    unsigned char          ucTerm2;
+    float                  xA0;
+    float                  xA1;
+    float                  xA2;
+    float                  xA3;
+    float                  xOneMinusA3f;
+    float                  xTerm2f;
+    double                 dOneMinusA3;
+    double                 dRecipFF;
+    double                 dTerm0;
+    double                 dTerm1;
+    double                 dTerm2;
 
-        mov  eax, dword ptr [esi + 0x218]
-        cmp  eax, 1
-        jnz  fmt2_or_3
+    p_stUi = (GLI_pc_tdstProgressUi *)p_stUiObject;
+    if (x < 0 || x >= p_stUi->lBufferDimC || y < 0 || y >= p_stUi->lBufferDim8) {
+        return;
+    }
+    lWidth = p_stUi->lBufferDimC;
+    lFormat = p_stUi->lFormatKind;
+    pucBuf = (unsigned char *)p_stUi->p_vBuffer;
+    ulIdx = (unsigned long)(y * lWidth + x);
+    xA0 = p_xBlendDesc[0];
+    xA1 = p_xBlendDesc[1];
+    xA2 = p_xBlendDesc[2];
+    xA3 = p_xBlendDesc[3];
 
-        mov  edx, edi
-        mov  eax, dword ptr [esp + 0x38]
-        imul edx, ecx
-        fld  dword ptr [k_xBP_One_bits]
-        fld  dword ptr [eax]
-        fld  dword ptr [eax + 0x4]
-        fld  dword ptr [eax + 0x8]
-        fxch st(3)
-        fsub dword ptr [eax + 0xc]
-        mov  ebp, dword ptr [esi + 0x20c]
-        add  edx, ebx
-        xor  ecx, ecx
-        mov  cl, byte ptr [ebp + edx*4]
-        lea  ebp, [ebp + edx*4]
-        mov  dword ptr [esp + 0x38], ecx
-        xor  edx, edx
-        fild dword ptr [esp + 0x38]
-        mov  dl, byte ptr [ebp + 0x1]
-        xor  ecx, ecx
-        fxch st(3)
-        fmul st(0), st(1)
-        mov  dword ptr [esp + 0x38], edx
-        mov  cl, byte ptr [ebp + 0x2]
-        fild dword ptr [esp + 0x38]
-        fxch st(3)
-        fmul st(0), st(2)
-        fxch st(3)
-        fmul qword ptr [k_dBP_RecipFF_bits]
-        mov  dword ptr [esp + 0x38], ecx
-        fmul dword ptr [eax + 0xc]
-        faddp st(3), st(0)
-        fxch st(4)
-        fmul st(0), st(1)
-        fild dword ptr [esp + 0x38]
-        fxch st(3)
-        fstp st(2)
-        fxch st(3)
-        fmul qword ptr [k_dBP_RecipFF_bits]
-        fld  dword ptr [eax + 0xc]
-        fxch st(3)
-        fmul qword ptr [k_dBP_RecipFF_bits]
-        fmul dword ptr [eax + 0xc]
-        faddp st(4), st(0)
-        fxch st(2)
-        fmulp st(2), st(0)
-        fxch
-        faddp st(3), st(0)
-        fxch
-        fstp dword ptr [esp + 0x20]
-        fxch
-        fst  dword ptr [esp + 0x38]
-        fmul dword ptr [k_xBP_255_bits]
-        call _ftol
-        fmul dword ptr [k_xBP_255_bits]
-        mov  byte ptr [ebp], al
-        call _ftol
-        mov  edx, edi
-        mov  ecx, dword ptr [esi + 0x20c]
-        imul edx, dword ptr [esi + 0x210]
-        fld  dword ptr [esp + 0x20]
-        fmul dword ptr [k_xBP_255_bits]
-        add  edx, ebx
-        mov  byte ptr [ecx + edx*4 + 0x1], al
-        call _ftol
-        imul edi, dword ptr [esi + 0x210]
-        mov  edx, dword ptr [esi + 0x20c]
-        add  edi, ebx
-        mov  byte ptr [edx + edi*4 + 0x2], al
+    if (lFormat == 1) {
+        pucPix = pucBuf + ulIdx * 4;
+        dOneMinusA3 = (double)GLI_BP_K_xOne - (double)xA3;
+        dRecipFF = GLI_BP_K_dRecipFF;
+        dTerm0 = (double)xA0 * dOneMinusA3 + ((double)pucPix[0] * dRecipFF) * (double)xA3;
+        dTerm1 = (double)xA1 * dOneMinusA3 + ((double)pucPix[1] * dRecipFF) * (double)xA3;
+        dTerm2 = (double)xA2 * dOneMinusA3 + ((double)pucPix[2] * dRecipFF) * (double)xA3;
+        xTerm2f = (float)dTerm2;
+        pucPix[0] = (unsigned char)(long)(dTerm0 * GLI_BP_K_x255);
+        pucPix[1] = (unsigned char)(long)(dTerm1 * GLI_BP_K_x255);
+        pucPix[2] = (unsigned char)(long)((double)xTerm2f * GLI_BP_K_x255);
+        return;
+    }
 
-        pop  edi
-        pop  esi
-        pop  ebp
-        pop  ebx
-        add  esp, 0x18
-        ret
+    if (lFormat == 2) {
+        p_stPf = &p_stUi->stPixelFormat;
+        pusPix = (unsigned short *)pucBuf + ulIdx;
+        ulPix = (unsigned long)*pusPix;
+        dOneMinusA3 = GLI_BP_K_dOne - (double)xA3;
 
-    fmt2_or_3:
-        cmp  eax, 2
-        jnz  fmt3_or_end
+        lOld = (long)(((ulPix & p_stPf->ulBlueMask) >> p_stPf->lBlueShift)
+                      << (8 - p_stPf->lBlueNbBits));
+        ucTerm2 = (unsigned char)(long)((double)lOld * (double)xA3
+                                        - ((double)xA2 * dOneMinusA3) * GLI_BP_K_dNeg255);
 
-        imul edi, ecx
-        mov  ecx, dword ptr [esp + 0x30]
-        mov  edx, dword ptr [esi + 0x22c]
-        mov  eax, dword ptr [esi + 0x238]
-        add  edi, ecx
-        mov  ecx, dword ptr [esi + 0x20c]
-        mov  ebx, 0x8
-        mov  ebp, 0x8
-        sub  ebx, edx
-        mov  edx, dword ptr [esi + 0x244]
-        sub  ebp, eax
-        mov  eax, 0x8
-        lea  edi, [ecx + edi*2]
-        sub  eax, edx
-        mov  dx, word ptr [esi + 0x24c]
-        mov  cx, word ptr [edi]
-        mov  dword ptr [esp + 0x2c], edi
-        mov  dword ptr [esp + 0x30], ecx
-        and  edx, ecx
-        mov  cx, word ptr [esi + 0x248]
-        mov  edi, dword ptr [esp + 0x38]
-        shr  dx, cl
-        fld  dword ptr [edi + 0xc]
-        mov  ecx, eax
-        mov  dword ptr [esp + 0x10], eax
-        fsubr qword ptr [k_dBP_One_bits]
-        shl  edx, cl
-        and  edx, 0xffff
-        mov  dword ptr [esp + 0x38], edx
-        fild dword ptr [esp + 0x38]
-        fmul dword ptr [edi + 0xc]
-        fld  dword ptr [edi + 0x8]
-        fmul st(0), st(2)
-        fmul qword ptr [k_dBP_Neg255_bits]
-        fsubp st(1), st(0)
-        call _ftol
+        lOld = (long)(((ulPix & p_stPf->ulGreenMask) >> p_stPf->lGreenShift)
+                      << (8 - p_stPf->lGreenNbBits));
+        ucTerm1 = (unsigned char)(long)((double)lOld * (double)xA3
+                                        - ((double)xA1 * dOneMinusA3) * GLI_BP_K_dNeg255);
 
-        mov  dx, word ptr [esi + 0x240]
-        mov  ecx, dword ptr [esp + 0x30]
-        and  edx, ecx
-        mov  cx, word ptr [esi + 0x23c]
-        shr  dx, cl
-        mov  ecx, ebp
-        movzx ax, al
-        shl  edx, cl
-        mov  word ptr [esp + 0x14], ax
-        and  edx, 0xffff
-        mov  dword ptr [esp + 0x38], edx
-        fild dword ptr [esp + 0x38]
-        fmul dword ptr [edi + 0xc]
-        fld  dword ptr [edi + 0x4]
-        fmul st(0), st(2)
-        fmul qword ptr [k_dBP_Neg255_bits]
-        fsubp st(1), st(0)
-        call _ftol
+        lOld = (long)(((ulPix & p_stPf->ulRedMask) >> p_stPf->lRedShift)
+                      << (8 - p_stPf->lRedNbBits));
+        ucTerm0 = (unsigned char)(long)((double)lOld * (double)xA3
+                                        - ((double)xA0 * dOneMinusA3) * GLI_BP_K_dNeg255);
 
-        mov  dx, word ptr [esi + 0x234]
-        mov  ecx, dword ptr [esp + 0x30]
-        and  edx, ecx
-        mov  cx, word ptr [esi + 0x230]
-        shr  dx, cl
-        mov  ecx, ebx
-        movzx ax, al
-        shl  edx, cl
-        mov  word ptr [esp + 0x34], ax
-        and  edx, 0xffff
-        mov  dword ptr [esp + 0x38], edx
-        fild dword ptr [esp + 0x38]
-        fmul dword ptr [edi + 0xc]
-        fld  dword ptr [edi]
-        fmul st(0), st(2)
-        fmul qword ptr [k_dBP_Neg255_bits]
-        fsubp st(1), st(0)
-        fstp st(1)
-        call _ftol
+        ulOut = (((unsigned long)ucTerm0 >> (8 - p_stPf->lRedNbBits)) << p_stPf->lRedShift)
+              | (((unsigned long)ucTerm1 >> (8 - p_stPf->lGreenNbBits)) << p_stPf->lGreenShift)
+              | (((unsigned long)ucTerm2 >> (8 - p_stPf->lBlueNbBits)) << p_stPf->lBlueShift);
+        *pusPix = (unsigned short)(ulOut & 0xffffu);
+        return;
+    }
 
-        movzx ax, al
-        mov  cx, bx
-        shr  ax, cl
-        mov  ecx, dword ptr [esi + 0x230]
-        shl  eax, cl
-        mov  edx, dword ptr [esp + 0x34]
-        mov  cx, bp
-        shr  dx, cl
-        mov  ecx, dword ptr [esi + 0x23c]
-        shl  edx, cl
-        mov  cx, word ptr [esp + 0x10]
-        or   eax, edx
-        mov  edx, dword ptr [esp + 0x14]
-        shr  dx, cl
-        mov  ecx, dword ptr [esi + 0x248]
-        shl  edx, cl
-        mov  ecx, dword ptr [esp + 0x2c]
-        or   eax, edx
-        mov  word ptr [ecx], ax
-        pop  edi
-        pop  esi
-        pop  ebp
-        pop  ebx
-        add  esp, 0x18
-        ret
-
-    fmt3_or_end:
-        cmp  eax, 3
-        jnz  ret_path
-
-        mov  edx, edi
-        mov  eax, dword ptr [esp + 0x38]
-        imul edx, ecx
-        fld  dword ptr [k_xBP_One_bits]
-        fld  dword ptr [eax + 0x8]
-        fld  dword ptr [eax]
-        fld  dword ptr [eax + 0x4]
-        mov  ecx, dword ptr [esi + 0x20c]
-        add  edx, ebx
-        lea  ebp, [ecx + edx*2]
-        mov  dword ptr [esp + 0x2c], ebp
-        mov  dl, byte ptr [ebp]
-        mov  cl, byte ptr [ebp + 0x1]
-        mov  byte ptr [esp + 0x38], dl
-        mov  byte ptr [esp + 0x39], cl
-        mov  ecx, dword ptr [esp + 0x38]
-        mov  edx, ecx
-        mov  ebp, ecx
-        shr  edx, 7
-        and  edx, 0xf8
-        and  ebp, 0x1f
-        mov  dword ptr [esp + 0x30], edx
-        fild dword ptr [esp + 0x30]
-        fxch st(4)
-        fsub dword ptr [eax + 0xc]
-        fxch st(4)
-        fmul qword ptr [k_dBP_RecipFF_bits]
-        shl  ebp, 3
-        mov  dword ptr [esp + 0x30], ebp
-        fild dword ptr [esp + 0x30]
-        fxch st(5)
-        fstp dword ptr [esp + 0x30]
-        shr  ecx, 3
-        and  ecx, 0x7c
-        fxch st(3)
-        fmul dword ptr [esp + 0x30]
-        mov  dword ptr [esp + 0x34], ecx
-        fild dword ptr [esp + 0x34]
-        fxch st(5)
-        fmul qword ptr [k_dBP_RecipFF_bits]
-        fmul dword ptr [eax + 0xc]
-        fxch st(3)
-        fmul dword ptr [esp + 0x30]
-        faddp st(3), st(0)
-        fxch st(4)
-        fmul qword ptr [k_dBP_RecipFF_bits]
-        fxch st(3)
-        fst  dword ptr [esp + 0x34]
-        fmul dword ptr [eax + 0xc]
-        fxch st(3)
-        fst  dword ptr [esp + 0x34]
-        fxch st(4)
-        faddp st(3), st(0)
-        fxch st(3)
-        fmul dword ptr [eax + 0xc]
-        fxch st(2)
-        fst  dword ptr [esp + 0x20]
-        fmul dword ptr [k_xBP_255_bits]
-        fxch
-        fxch st(3)
-        fmul dword ptr [esp + 0x30]
-        faddp st(2), st(0)
-        call _ftol
-        fmul dword ptr [k_xBP_255_bits]
-        movzx bp, al
-        and  ebp, 0x1f8
-        shl  ebp, 5
-        call _ftol
-        fmul dword ptr [k_xBP_255_bits]
-        movzx ax, al
-        and  eax, 0x3ff8
-        add  ebp, eax
-        call _ftol
-        shr  al, 3
-        xor  cx, cx
-        mov  cl, al
-        lea  edx, [ecx + ebp*4]
-        mov  ecx, dword ptr [esp + 0x2c]
-        mov  word ptr [esp + 0x38], dx
-        mov  al, byte ptr [esp + 0x38]
-        mov  byte ptr [ecx], al
-        imul edi, dword ptr [esi + 0x210]
-        mov  edx, dword ptr [esi + 0x20c]
-        mov  al, byte ptr [esp + 0x39]
-        add  edi, ebx
-        mov  byte ptr [edx + edi*2 + 0x1], al
-
-    ret_path:
-        pop  edi
-        pop  esi
-        pop  ebp
-        pop  ebx
-        add  esp, 0x18
-        ret
+    if (lFormat == 3) {
+        pucPix = pucBuf + ulIdx * 2;
+        ulPix = (unsigned long)pucPix[0] | ((unsigned long)pucPix[1] << 8);
+        lT1 = (long)((ulPix >> 7) & 0xf8u);
+        lG8 = (long)((ulPix >> 3) & 0x7cu);
+        lB8 = (long)((ulPix & 0x1fu) << 3);
+        xOneMinusA3f = (float)((double)GLI_BP_K_xOne - (double)xA3);
+        dRecipFF = GLI_BP_K_dRecipFF;
+        dTerm0 = ((double)lB8 * dRecipFF) * (double)xA3 + (double)xA0 * (double)xOneMinusA3f;
+        dTerm1 = ((double)lG8 * dRecipFF) * (double)xA3 + (double)xA1 * (double)xOneMinusA3f;
+        dTerm2 = ((double)lT1 * dRecipFF) * (double)xA3 + (double)xA2 * (double)xOneMinusA3f;
+        ucTerm2 = (unsigned char)(long)(dTerm2 * GLI_BP_K_x255);
+        ucTerm1 = (unsigned char)(long)(dTerm1 * GLI_BP_K_x255);
+        ucTerm0 = (unsigned char)(long)(dTerm0 * GLI_BP_K_x255);
+        ulOut = ((((unsigned long)ucTerm2 & 0xf8u) << 5)
+                 + ((unsigned long)ucTerm1 & 0xf8u)) * 4u
+              + ((unsigned long)ucTerm0 >> 3);
+        pucPix[0] = (unsigned char)(ulOut & 0xffu);
+        pucPix[1] = (unsigned char)((ulOut >> 8) & 0xffu);
+        return;
     }
 }
 
 /* 0x0045f530 */
-__declspec(naked) void __cdecl GLI_FillProgressBarSpan(
-        int          ui_object,
-        unsigned int old_progress,
-        unsigned int new_progress)
+void __cdecl GLI_FillProgressBarSpan(int ui_object,
+                                     unsigned int old_progress,
+                                     unsigned int new_progress)
 {
-    __asm {
-        mov  eax, dword ptr [esp + 0x8]
-        mov  ecx, dword ptr [esp + 0xc]
-        sub  esp, 0x58
-        cmp  eax, ecx
-        push ebx
-        push ebp
-        push esi
-        jae  exit_noedi
-        mov  esi, dword ptr [esp + 0x68]
-        mov  eax, dword ptr [esi + 0x27c]
-        mov  ebp, dword ptr [esi + 0x274]
-        mov  ebx, dword ptr [esi + 0x270]
-        mov  edx, dword ptr [esi + 0x278]
-        mov  ecx, eax
-        sub  edx, ebx
-        sub  ecx, ebp
-        add  ebp, 2
-        mov  dword ptr [esp + 0x1c], ecx
-        lea  ecx, [eax - 2]
-        cmp  ebp, ecx
-        mov  dword ptr [esp + 0x20], edx
-        mov  dword ptr [esp + 0x18], ebp
-        ja   exit_noedi
+    GLI_pc_tdstProgressUi *p_stUi;
+    float (*pxCorner)[4];
+    float a_xDesc[4];
+    float xDiv;
+    float xW2Pf;
+    float xW2Qf;
+    float xQRf;
+    double dDiv;
+    long lXStart;
+    long lXEnd;
+    long lYStart;
+    long lYEnd;
+    long lWidth;
+    long lHeight;
+    long lY;
+    long lRowOff;
+    long lHRem;
+    long lRowW;
+    long lW2;
+    long lX;
+    long lXLimit;
+    long lP;
+    long lQ;
+    long lW2P;
+    long lW2Q;
+    long lPR;
+    long lQR;
 
-        push edi
-    row_init:
-        mov  edi, dword ptr [esi + 0x274]
-        sub  eax, ebp
-        mov  dword ptr [esp + 0x6c], eax
-        mov  eax, dword ptr [esp + 0x70]
-        mov  ecx, ebp
-        sub  ecx, edi
-        lea  edi, [eax + ebx + 2]
-        mov  eax, dword ptr [esp + 0x74]
-        lea  eax, [eax + ebx + 1]
-        cmp  edi, eax
-        ja   next_row_jmp
-        mov  ebp, dword ptr [esp + 0x20]
-        mov  dword ptr [esp + 0x34], 0
-        sub  ebp, ecx
-        mov  ecx, dword ptr [esp + 0x20]
-        mov  eax, ecx
-        mov  dword ptr [esp + 0x28], ebp
-        sub  eax, dword ptr [esp + 0x6c]
-        imul ecx, edx
-        mov  dword ptr [esp + 0x30], ecx
-        mov  dword ptr [esp + 0x2c], eax
-        fild qword ptr [esp + 0x30]
-        fstp dword ptr [esp + 0x6c]
-        jmp  pixel_compute
+    if (old_progress >= new_progress) {
+        return;
+    }
+    p_stUi = (GLI_pc_tdstProgressUi *)ui_object;
+    pxCorner = p_stUi->a_xCornerBlend;
+    lXStart = p_stUi->lBarXStart;
+    lXEnd = p_stUi->lBarXEnd;
+    lYStart = p_stUi->lBarYStart;
+    lYEnd = p_stUi->lBarYEnd;
+    lWidth = lXEnd - lXStart;
+    lHeight = lYEnd - lYStart;
+    lY = lYStart + 2;
 
-    pixel_loop_back:
-        mov  ebp, dword ptr [esp + 0x28]
-        mov  edx, dword ptr [esp + 0x24]
+    while ((unsigned long)lY <= (unsigned long)(lYEnd - 2)) {
+        lRowOff = lY - p_stUi->lBarYStart;
+        lHRem = lYEnd - lY;
+        lX = (long)((unsigned long)old_progress + (unsigned long)lXStart + 2u);
+        lXLimit = (long)((unsigned long)new_progress + (unsigned long)lXStart + 1u);
+        if ((unsigned long)lX <= (unsigned long)lXLimit) {
+            lRowW = lHeight - lRowOff;
+            lW2 = lHeight - lHRem;
+            xDiv = (float)(lHeight * lWidth);
+            dDiv = (double)xDiv;
+            do {
+                lXEnd = p_stUi->lBarXEnd;
+                lP = lWidth - (lXEnd - lX);
+                lQ = lWidth - (lX - lXStart);
+                lW2P = lW2 * lP;
+                lW2Q = lW2 * lQ;
+                lPR = lP * lRowW;
+                lQR = lQ * lRowW;
+                xW2Pf = (float)lW2P;
+                xW2Qf = (float)lW2Q;
+                xQRf = (float)lQR;
 
-    pixel_compute:
-        mov  ecx, dword ptr [esi + 0x278]
-        mov  eax, edi
-        sub  eax, ebx
-        sub  ecx, edi
-        mov  ebx, edx
-        sub  edx, ecx
-        sub  ebx, eax
-        mov  eax, dword ptr [esp + 0x2c]
-        mov  dword ptr [esp + 0x14], edx
-        mov  ecx, eax
-        imul eax, dword ptr [esp + 0x14]
-        imul edx, ebp
-        fld  dword ptr [esi + 0x2c8]
-        fld  dword ptr [esi + 0x2d8]
-        mov  dword ptr [esp + 0x10], ebx
-        mov  dword ptr [esp + 0x18], ecx
-        imul ecx, dword ptr [esp + 0x10]
-        imul ebx, ebp
-        mov  dword ptr [esp + 0x38], eax
-        xor  eax, eax
-        mov  dword ptr [esp + 0x3c], eax
-        mov  dword ptr [esp + 0x40], ecx
-        fild qword ptr [esp + 0x38]
-        mov  dword ptr [esp + 0x44], eax
-        mov  dword ptr [esp + 0x48], edx
-        fild qword ptr [esp + 0x40]
-        mov  dword ptr [esp + 0x4c], eax
-        mov  dword ptr [esp + 0x50], ebx
-        fild qword ptr [esp + 0x48]
-        mov  dword ptr [esp + 0x54], eax
-        fild qword ptr [esp + 0x50]
-        fld  st(1)
-        fxch
-        fst  dword ptr [esp + 0x10]
-        fxch st(4)
-        fst  dword ptr [esp + 0x14]
-        fxch st(3)
-        fst  dword ptr [esp + 0x18]
-        fxch st(3)
-        fmul dword ptr [esi + 0x2d0]
-        fdiv dword ptr [esp + 0x6c]
-        fxch st(3)
-        fmul dword ptr [esi + 0x2c0]
-        fdiv dword ptr [esp + 0x6c]
-        faddp st(3), st(0)
-        fld  dword ptr [esp + 0x14]
-        fxch
-        fmul dword ptr [esi + 0x2b0]
-        fdiv dword ptr [esp + 0x6c]
-        faddp st(3), st(0)
-        fld  dword ptr [esp + 0x18]
-        fld  dword ptr [esp + 0x10]
-        fmul dword ptr [esi + 0x2a0]
-        fdiv dword ptr [esp + 0x6c]
-        faddp st(4), st(0)
-        fxch st(3)
-        fstp dword ptr [esp + 0x58]
-        fmul dword ptr [esi + 0x2d4]
-        fld  dword ptr [esp + 0x10]
-        fxch
-        fdiv dword ptr [esp + 0x6c]
-        fxch st(3)
-        fmul dword ptr [esi + 0x2c4]
-        fdiv dword ptr [esp + 0x6c]
-        faddp st(3), st(0)
-        fxch st(5)
-        fmul dword ptr [esp + 0x18]
-        fld  st(1)
-        fxch st(4)
-        fmul dword ptr [esi + 0x2a4]
-        fdiv dword ptr [esp + 0x6c]
-        faddp st(3), st(0)
-        fxch st(4)
-        fmul dword ptr [esp + 0x14]
-        fxch st(4)
-        fdiv dword ptr [esp + 0x6c]
-        fxch st(4)
-        fdiv dword ptr [esp + 0x6c]
-        fxch st(5)
-        fmul dword ptr [esi + 0x2a8]
-        fld  st(1)
-        fxch st(4)
-        fmul dword ptr [esi + 0x2b4]
-        mov  eax, dword ptr [esi + 0x278]
-        add  eax, -2
-        fdiv dword ptr [esp + 0x6c]
-        cmp  edi, eax
-        faddp st(3), st(0)
-        fxch st(5)
-        faddp st(4), st(0)
-        fxch st(4)
-        fdiv dword ptr [esp + 0x6c]
-        faddp st(3), st(0)
-        fstp dword ptr [esp + 0x5c]
-        fmul dword ptr [esi + 0x2b8]
-        fdiv dword ptr [esp + 0x6c]
-        faddp st(1), st(0)
-        fstp dword ptr [esp + 0x60]
-        fld  dword ptr [esi + 0x2ac]
-        fld  dword ptr [esi + 0x2bc]
-        fmul st, st(2)
-        fld  dword ptr [esi + 0x2dc]
-        fxch st(2)
-        fmul dword ptr [esp + 0x10]
-        fxch
-        fdiv dword ptr [esp + 0x6c]
-        fxch
-        fdiv dword ptr [esp + 0x6c]
-        fxch st(2)
-        fmul dword ptr [esp + 0x14]
-        fld  dword ptr [esi + 0x2cc]
-        fmul dword ptr [esp + 0x18]
-        fxch
-        fdiv dword ptr [esp + 0x6c]
-        fxch
-        fdiv dword ptr [esp + 0x6c]
-        fxch st(3)
-        faddp st(2), st(0)
-        faddp st(1), st(0)
-        fxch
-        faddp st(1), st(0)
-        fstp dword ptr [esp + 0x64]
-        fstp st(0)
+                a_xDesc[0] = (float)(((((double)lW2P * pxCorner[3][0]) / dDiv
+                                       + ((double)lW2Q * pxCorner[2][0]) / dDiv)
+                                       + ((double)lPR * pxCorner[1][0]) / dDiv)
+                                       + ((double)xQRf * pxCorner[0][0]) / dDiv);
+                a_xDesc[1] = (float)(((((double)xW2Pf * pxCorner[3][1]) / dDiv
+                                       + ((double)xW2Qf * pxCorner[2][1]) / dDiv)
+                                       + ((double)lQR * pxCorner[0][1]) / dDiv)
+                                       + ((double)lPR * pxCorner[1][1]) / dDiv);
+                a_xDesc[2] = (float)(((((double)xW2Qf * pxCorner[2][2]) / dDiv
+                                       + ((double)xW2Pf * pxCorner[3][2]) / dDiv)
+                                       + ((double)xQRf * pxCorner[0][2]) / dDiv)
+                                       + ((double)lPR * pxCorner[1][2]) / dDiv);
+                a_xDesc[3] = (float)(((((double)lPR * pxCorner[1][3]) / dDiv
+                                       + ((double)xQRf * pxCorner[0][3]) / dDiv)
+                                       + ((double)xW2Pf * pxCorner[3][3]) / dDiv)
+                                       + ((double)xW2Qf * pxCorner[2][3]) / dDiv);
 
-        ja   skip_blend
-        mov  ebp, dword ptr [esp + 0x1c]
-        lea  ecx, [esp + 0x58]
-        push ecx
-        push ebp
-        push edi
-        push esi
-        call GLI_BlendPixelIntoUiSurface      /* 0x0045f030 */
-        add  esp, 0x10
-        jmp  after_blend
-
-    skip_blend:
-        mov  ebp, dword ptr [esp + 0x1c]
-
-    after_blend:
-        mov  ebx, dword ptr [esi + 0x270]
-        mov  edx, dword ptr [esp + 0x74]
-        inc  edi
-        lea  eax, [edx + ebx + 1]
-        cmp  edi, eax
-        jbe  pixel_loop_back
-
-        mov  edx, dword ptr [esp + 0x24]
-    next_row_jmp:
-        mov  eax, dword ptr [esi + 0x27c]
-        inc  ebp
-        mov  dword ptr [esp + 0x1c], ebp
-        lea  ecx, [eax - 2]
-        cmp  ebp, ecx
-        jbe  row_init
-        pop  edi
-    exit_noedi:
-        pop  esi
-        pop  ebp
-        pop  ebx
-        add  esp, 0x58
-        ret
+                if ((unsigned long)lX <= (unsigned long)(lXEnd - 2)) {
+                    GLI_BlendPixelIntoUiSurface(ui_object, (int)lX, (int)lY, a_xDesc);
+                }
+                lXStart = p_stUi->lBarXStart;
+                lX++;
+            } while ((unsigned long)lX <= (unsigned long)(new_progress + (unsigned long)lXStart + 1u));
+        }
+        lYEnd = p_stUi->lBarYEnd;
+        lY++;
     }
 }
 

@@ -15915,7 +15915,7 @@
 "name": "GLI_BlendPixelIntoUiSurface",
 "src": "src/GLI/Texture.c",
 "len": 1007,
-"verdict": "EXACT"
+"verdict": "MISMATCH"
 },
 {
 "addr": "0x0045F420",
@@ -15929,7 +15929,7 @@
 "name": "GLI_FillProgressBarSpan",
 "src": "src/GLI/Texture.c",
 "len": 688,
-"verdict": "EXACT"
+"verdict": "MISMATCH"
 },
 {
 "addr": "0x0045F7E0",
