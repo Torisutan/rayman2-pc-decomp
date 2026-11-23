@@ -1120,8 +1120,6 @@ __declspec(naked) void __cdecl GLD_vGetFrontBufferIn24BitsAA(
     unsigned long lWidth, unsigned long lHeight,
     unsigned char *p_lBufferDst)
 {
-    (void)hGLDDevice; (void)hGLDViewport; (void)lWidth;
-    (void)lHeight;    (void)p_lBufferDst;
     __asm {
         /* 0x0042BD20 */
         sub  esp, 0xe8
@@ -1520,9 +1518,6 @@ __declspec(naked) void __cdecl fn_vChangeViewPortPercent(
     int           _iPosX,
     int           _iPosY)
 {
-    (void)_ulMode; (void)_ulWhat; (void)_ulWidth; (void)_ulHeight;
-    (void)_ulClipTop; (void)_ulClipLeft; (void)_ulClipBottom; (void)_ulClipRight;
-    (void)_iPosX; (void)_iPosY;
     __asm {
 
         mov  eax, dword ptr [GAM_AA_engine_14C]

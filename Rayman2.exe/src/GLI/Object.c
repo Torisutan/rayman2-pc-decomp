@@ -45,9 +45,9 @@ struct GLD_tdstViewportAttributes
     short         hViewport;
 };
 
-void GEO_vTurnLookAt(void *p_stObj, void *hVpt, void *p_stCurrentMatrix);
+void GEO_vTurnLookAt(GEO_tdstGeometricObject *p_stObj, void *hVpt, POS_tdstCompletePosition *p_stCurrentMatrix);
 void __cdecl FUN_00428da0(int base, short *p, int idx, int arg4);
-extern void *GLI_gs_aDEF_p_CurrentListOfLight[];
+extern void *GLI_gs_aDEF_p_CurrentListOfLight[300];
 /* 0x0041DAC0 */
 ACP_tdxBool GEO_bIsLookAt(struct GEO_tdstGeometricObject_ *p_stObj);
 
@@ -574,7 +574,6 @@ __declspec(naked)
 void __cdecl GLI_vDoMaterialSelection(
     struct GLI_tdstInternalGlobalValuesFor3dEngine_ *p_stGlobals)
 {
-    (void)p_stGlobals;
     __asm {
         /* 0x42a410 */
         push ecx
@@ -810,7 +809,6 @@ void __cdecl GLI_xSendObjectToViewportWithLights(
     void                              *p_stObj,
     long                               lDrawModeMask)
 {
-    (void)p_stVpt; (void)p_stObj; (void)lDrawModeMask;
     __asm {
 
         sub  esp, 0x60

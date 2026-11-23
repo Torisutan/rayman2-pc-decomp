@@ -1035,7 +1035,6 @@ extern long __cdecl _ftol(void);
 __declspec(naked) void __cdecl GLI_BlendPixelIntoUiSurface(
     int p_stUiObject, int x, int y, float *p_xBlendDesc)
 {
-    (void)p_stUiObject; (void)x; (void)y; (void)p_xBlendDesc;
     __asm {
         /* 0x0045f030 */
         sub  esp, 0x18
@@ -1349,7 +1348,6 @@ __declspec(naked) void __cdecl GLI_FillProgressBarSpan(
         unsigned int old_progress,
         unsigned int new_progress)
 {
-    (void)ui_object; (void)old_progress; (void)new_progress;
     __asm {
         mov  eax, dword ptr [esp + 0x8]
         mov  ecx, dword ptr [esp + 0xc]
@@ -1574,7 +1572,6 @@ __declspec(naked) void __cdecl GLI_FillProgressBarSpan(
 /* 0x0045f420 */
 __declspec(naked) void __cdecl GLI_DrawProgressBarFrameAndFill(int ui_object)
 {
-    (void)ui_object;
     __asm {
         mov  eax, dword ptr [GLI_AA_ProgressBarDivisor]  /* 0x00516640 */
         push ebx
@@ -1683,7 +1680,6 @@ __declspec(naked) void __cdecl GLI_DrawProgressBarFrameAndFill(int ui_object)
 /* 0x0045f7e0 */
 __declspec(naked) unsigned int __cdecl GLI_AddToProgressBar(int lIncrement)
 {
-    (void)lIncrement;
     __asm {
         mov  edx, dword ptr [GLI_AA_ProgressBarStart]
         mov  al,  byte ptr [GLI_AA_ProgressBarEnabled]
@@ -1750,7 +1746,6 @@ void __cdecl GLI_pc_fn_vWrite16bBitmapToBackBuffer(void *p_vBuffer, long lPitch,
 /* 0x0045eed0 */
 __declspec(naked) void __cdecl GLI_RefreshUiSurfaceIfVisible(char *ui_object)
 {
-    (void)ui_object;
     __asm {
         sub  esp, 0x70
         push esi
@@ -1824,7 +1819,6 @@ __declspec(naked) void __cdecl GLI_RefreshUiSurfaceIfVisible(char *ui_object)
 /* 0x0045efb0 */
 __declspec(naked) void __cdecl GLI_RefreshUiSurfaceUnsynchronized(char *ui_object)
 {
-    (void)ui_object;
     __asm {
         sub  esp, 0x70
         push esi

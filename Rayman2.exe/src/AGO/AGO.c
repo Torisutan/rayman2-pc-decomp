@@ -86,7 +86,6 @@ extern float gs_fCoefOfMultiplicationForAnimatedTexture;
 __declspec(naked) void AGO_Define_OrthogonalVectors(
     MTH3D_tdstVector *p_stDirection, MTH3D_tdstVector *p_stV1, MTH3D_tdstVector *p_stV2)
 {
-    (void)p_stDirection; (void)p_stV1; (void)p_stV2;
     __asm {
         sub     esp, 0x2c
         mov     ecx, [esp+0x30]

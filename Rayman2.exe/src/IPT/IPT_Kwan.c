@@ -750,32 +750,36 @@ const unsigned long IPT_KW_aulCorrectionTable[46] = {
     0x3FAF16E3, 0x3FB10ADD, 0x3FB304EE, 0x3FB504F7
 };
 
+#define IPT_C_KeyWordElementSize 8
+
+enum { IPT_C_lAxisCapsRangeOffset = (int)&((INO_pc_tdstAxisDeviceCaps *)0)->a_stAxis
+                                  + (int)&((INO_tdstAxisCaps *)0)->m_lRange };
+
 /* 0x0042F390 */
 __declspec(naked) unsigned char __cdecl
 IPT_fn_bIsKeyWordValid_JoystickAngularValue(IPT_tdstKeyWordElement *_hKeyWordElement)
 {
-    (void)_hKeyWordElement;
     __asm {
         mov     ecx, dword ptr [esp + 0x4]
         push    ebx
         push    ebp
         push    esi
-        lea     esi, [ecx + TYPE IPT_tdstKeyWordElement]
+        lea     esi, [ecx + IPT_C_KeyWordElementSize]
         push    edi
         mov     dword ptr [IPT_g_hNextParameter], esi
         xor     al, al
         movsx   ecx, word ptr [esi]IPT_tdstKeyWordElement.u_ElementUnion.swValue
-        add     esi, TYPE IPT_tdstKeyWordElement
+        add     esi, IPT_C_KeyWordElementSize
         mov     dword ptr [IPT_g_hNextParameter], esi
         mov     edx, dword ptr IPT_g_hInputStructure.a_hINODevice[ecx*4 + IPT_E_Pad00DeviceEvent*4]
         movsx   edi, word ptr [esi]IPT_tdstKeyWordElement.u_ElementUnion.swValue
-        add     esi, TYPE IPT_tdstKeyWordElement
+        add     esi, IPT_C_KeyWordElementSize
         mov     dword ptr [IPT_g_hNextParameter], esi
         movsx   ebx, word ptr [esi]IPT_tdstKeyWordElement.u_ElementUnion.swValue
-        add     esi, TYPE IPT_tdstKeyWordElement
+        add     esi, IPT_C_KeyWordElementSize
         mov     dword ptr [IPT_g_hNextParameter], esi
         movsx   ebp, word ptr [esi]IPT_tdstKeyWordElement.u_ElementUnion.swValue
-        add     esi, TYPE IPT_tdstKeyWordElement
+        add     esi, IPT_C_KeyWordElementSize
         cmp     byte ptr IPT_g_hInputStructure.p_ucValideAndActiveDevice[ecx + IPT_E_Pad00DeviceEvent], IPT_C_ActivateJoystickDevice
         mov     dword ptr [esp + 0x14], ebp
         mov     dword ptr [IPT_g_hNextParameter], esi
@@ -786,11 +790,11 @@ IPT_fn_bIsKeyWordValid_JoystickAngularValue(IPT_tdstKeyWordElement *_hKeyWordEle
         cmp     eax, 0x5
         ja      LdefA
         mov     ecx, dword ptr [edx]INO_tdstDevice.p_stState
-        lea     edi, [eax*4 + INO_pc_tdstJoyState.a_lAxis]
+        lea     edi, [eax*4]INO_pc_tdstJoyState.a_lAxis
         fild    dword ptr [ecx + edi]
         mov     ecx, dword ptr [edx]INO_tdstDevice.p_stCaps
         lea     edi, [eax + eax*2]
-        lea     edi, [edi*4]INO_pc_tdstAxisDeviceCaps.a_stAxis.m_lRange
+        lea     edi, [edi*4 + IPT_C_lAxisCapsRangeOffset]
         fidiv   dword ptr [ecx + edi]
         jmp     LaftA
     LdefA:
@@ -801,11 +805,11 @@ IPT_fn_bIsKeyWordValid_JoystickAngularValue(IPT_tdstKeyWordElement *_hKeyWordEle
         cmp     eax, 0x5
         ja      LdefB
         mov     ecx, dword ptr [edx]INO_tdstDevice.p_stState
-        lea     edi, [eax*4 + INO_pc_tdstJoyState.a_lAxis]
+        lea     edi, [eax*4]INO_pc_tdstJoyState.a_lAxis
         fild    dword ptr [ecx + edi]
         mov     ecx, dword ptr [edx]INO_tdstDevice.p_stCaps
         lea     edi, [eax + eax*2]
-        lea     edi, [edi*4]INO_pc_tdstAxisDeviceCaps.a_stAxis.m_lRange
+        lea     edi, [edi*4 + IPT_C_lAxisCapsRangeOffset]
         fidiv   dword ptr [ecx + edi]
         jmp     LaftB
     LdefB:
@@ -855,7 +859,7 @@ IPT_fn_bIsKeyWordValid_JoystickAngularValue(IPT_tdstKeyWordElement *_hKeyWordEle
         mov     edx, dword ptr [IPT_g_h_ActualEntryInput]
         fstp    dword ptr [edx]IPT_tdstEntryElement.xAnalogicValue
         mov     esi, dword ptr [IPT_g_hNextParameter]
-        add     esi, TYPE IPT_tdstKeyWordElement
+        add     esi, IPT_C_KeyWordElementSize
         mov     dword ptr [IPT_g_hNextParameter], esi
         pop     edi
         pop     esi
@@ -865,7 +869,7 @@ IPT_fn_bIsKeyWordValid_JoystickAngularValue(IPT_tdstKeyWordElement *_hKeyWordEle
     Ldisc:
         fstp    st(0)
     Lfi:
-        add     esi, TYPE IPT_tdstKeyWordElement
+        add     esi, IPT_C_KeyWordElementSize
         pop     edi
         mov     dword ptr [IPT_g_hNextParameter], esi
         pop     esi
@@ -879,28 +883,27 @@ IPT_fn_bIsKeyWordValid_JoystickAngularValue(IPT_tdstKeyWordElement *_hKeyWordEle
 __declspec(naked) unsigned char __cdecl
 IPT_fn_bIsKeyWordValid_JoystickTrueNormValue(IPT_tdstKeyWordElement *_hKeyWordElement)
 {
-    (void)_hKeyWordElement;
     __asm {
         mov     ecx, dword ptr [esp + 0x4]
         push    ebx
         push    ebp
         push    esi
-        lea     esi, [ecx + TYPE IPT_tdstKeyWordElement]
+        lea     esi, [ecx + IPT_C_KeyWordElementSize]
         push    edi
         mov     dword ptr [IPT_g_hNextParameter], esi
         xor     al, al
         movsx   ecx, word ptr [esi]IPT_tdstKeyWordElement.u_ElementUnion.swValue
-        add     esi, TYPE IPT_tdstKeyWordElement
+        add     esi, IPT_C_KeyWordElementSize
         mov     dword ptr [IPT_g_hNextParameter], esi
         mov     edx, dword ptr IPT_g_hInputStructure.a_hINODevice[ecx*4 + IPT_E_Pad00DeviceEvent*4]
         movsx   edi, word ptr [esi]IPT_tdstKeyWordElement.u_ElementUnion.swValue
-        add     esi, TYPE IPT_tdstKeyWordElement
+        add     esi, IPT_C_KeyWordElementSize
         mov     dword ptr [IPT_g_hNextParameter], esi
         movsx   ebx, word ptr [esi]IPT_tdstKeyWordElement.u_ElementUnion.swValue
-        add     esi, TYPE IPT_tdstKeyWordElement
+        add     esi, IPT_C_KeyWordElementSize
         mov     dword ptr [IPT_g_hNextParameter], esi
         movsx   ebp, word ptr [esi]IPT_tdstKeyWordElement.u_ElementUnion.swValue
-        add     esi, TYPE IPT_tdstKeyWordElement
+        add     esi, IPT_C_KeyWordElementSize
         cmp     byte ptr IPT_g_hInputStructure.p_ucValideAndActiveDevice[ecx + IPT_E_Pad00DeviceEvent], IPT_C_ActivateJoystickDevice
         mov     dword ptr [esp + 0x14], ebp
         mov     dword ptr [IPT_g_hNextParameter], esi
@@ -910,11 +913,11 @@ IPT_fn_bIsKeyWordValid_JoystickTrueNormValue(IPT_tdstKeyWordElement *_hKeyWordEl
         cmp     eax, 0x5
         ja      LdefA
         mov     ecx, dword ptr [edx]INO_tdstDevice.p_stState
-        lea     edi, [eax*4 + INO_pc_tdstJoyState.a_lAxis]
+        lea     edi, [eax*4]INO_pc_tdstJoyState.a_lAxis
         fild    dword ptr [ecx + edi]
         mov     ecx, dword ptr [edx]INO_tdstDevice.p_stCaps
         lea     edi, [eax + eax*2]
-        lea     edi, [edi*4]INO_pc_tdstAxisDeviceCaps.a_stAxis.m_lRange
+        lea     edi, [edi*4 + IPT_C_lAxisCapsRangeOffset]
         fidiv   dword ptr [ecx + edi]
         jmp     LaftA
     LdefA:
@@ -924,11 +927,11 @@ IPT_fn_bIsKeyWordValid_JoystickTrueNormValue(IPT_tdstKeyWordElement *_hKeyWordEl
         cmp     eax, 0x5
         ja      LdefB
         mov     ecx, dword ptr [edx]INO_tdstDevice.p_stState
-        lea     edi, [eax*4 + INO_pc_tdstJoyState.a_lAxis]
+        lea     edi, [eax*4]INO_pc_tdstJoyState.a_lAxis
         fild    dword ptr [ecx + edi]
         mov     ecx, dword ptr [edx]INO_tdstDevice.p_stCaps
         lea     edi, [eax + eax*2]
-        lea     edi, [edi*4]INO_pc_tdstAxisDeviceCaps.a_stAxis.m_lRange
+        lea     edi, [edi*4 + IPT_C_lAxisCapsRangeOffset]
         fidiv   dword ptr [ecx + edi]
         jmp     LaftB
     LdefB:
@@ -962,7 +965,7 @@ IPT_fn_bIsKeyWordValid_JoystickTrueNormValue(IPT_tdstKeyWordElement *_hKeyWordEl
         mov     edx, dword ptr [IPT_g_h_ActualEntryInput]
         fstp    dword ptr [edx]IPT_tdstEntryElement.xAnalogicValue
         mov     esi, dword ptr [IPT_g_hNextParameter]
-        add     esi, TYPE IPT_tdstKeyWordElement
+        add     esi, IPT_C_KeyWordElementSize
         mov     dword ptr [IPT_g_hNextParameter], esi
         pop     edi
         pop     esi
@@ -972,7 +975,7 @@ IPT_fn_bIsKeyWordValid_JoystickTrueNormValue(IPT_tdstKeyWordElement *_hKeyWordEl
     Ldisc:
         fstp    st(0)
     Lfi:
-        add     esi, TYPE IPT_tdstKeyWordElement
+        add     esi, IPT_C_KeyWordElementSize
         pop     edi
         mov     dword ptr [IPT_g_hNextParameter], esi
         pop     esi
@@ -986,29 +989,28 @@ IPT_fn_bIsKeyWordValid_JoystickTrueNormValue(IPT_tdstKeyWordElement *_hKeyWordEl
 __declspec(naked) unsigned char __cdecl
 IPT_fn_bIsKeyWordValid_JoystickCorrectedNormValue(IPT_tdstKeyWordElement *_hKeyWordElement)
 {
-    (void)_hKeyWordElement;
     __asm {
         push    ecx
         mov     ecx, dword ptr [esp + 0x8]
         push    ebx
         push    ebp
         push    esi
-        lea     esi, [ecx + TYPE IPT_tdstKeyWordElement]
+        lea     esi, [ecx + IPT_C_KeyWordElementSize]
         push    edi
         mov     dword ptr [IPT_g_hNextParameter], esi
         xor     al, al
         movsx   ecx, word ptr [esi]IPT_tdstKeyWordElement.u_ElementUnion.swValue
-        add     esi, TYPE IPT_tdstKeyWordElement
+        add     esi, IPT_C_KeyWordElementSize
         mov     dword ptr [IPT_g_hNextParameter], esi
         mov     edx, dword ptr IPT_g_hInputStructure.a_hINODevice[ecx*4 + IPT_E_Pad00DeviceEvent*4]
         movsx   edi, word ptr [esi]IPT_tdstKeyWordElement.u_ElementUnion.swValue
-        add     esi, TYPE IPT_tdstKeyWordElement
+        add     esi, IPT_C_KeyWordElementSize
         mov     dword ptr [IPT_g_hNextParameter], esi
         movsx   ebx, word ptr [esi]IPT_tdstKeyWordElement.u_ElementUnion.swValue
-        add     esi, TYPE IPT_tdstKeyWordElement
+        add     esi, IPT_C_KeyWordElementSize
         mov     dword ptr [IPT_g_hNextParameter], esi
         movsx   ebp, word ptr [esi]IPT_tdstKeyWordElement.u_ElementUnion.swValue
-        add     esi, TYPE IPT_tdstKeyWordElement
+        add     esi, IPT_C_KeyWordElementSize
         cmp     byte ptr IPT_g_hInputStructure.p_ucValideAndActiveDevice[ecx + IPT_E_Pad00DeviceEvent], IPT_C_ActivateJoystickDevice
         mov     dword ptr [esp + 0x10], ebp
         mov     dword ptr [IPT_g_hNextParameter], esi
@@ -1018,11 +1020,11 @@ IPT_fn_bIsKeyWordValid_JoystickCorrectedNormValue(IPT_tdstKeyWordElement *_hKeyW
         cmp     eax, 0x5
         ja      LdefA
         mov     ecx, dword ptr [edx]INO_tdstDevice.p_stState
-        lea     edi, [eax*4 + INO_pc_tdstJoyState.a_lAxis]
+        lea     edi, [eax*4]INO_pc_tdstJoyState.a_lAxis
         fild    dword ptr [ecx + edi]
         mov     ecx, dword ptr [edx]INO_tdstDevice.p_stCaps
         lea     edi, [eax + eax*2]
-        lea     edi, [edi*4]INO_pc_tdstAxisDeviceCaps.a_stAxis.m_lRange
+        lea     edi, [edi*4 + IPT_C_lAxisCapsRangeOffset]
         fidiv   dword ptr [ecx + edi]
         jmp     LaftA
     LdefA:
@@ -1032,11 +1034,11 @@ IPT_fn_bIsKeyWordValid_JoystickCorrectedNormValue(IPT_tdstKeyWordElement *_hKeyW
         cmp     eax, 0x5
         ja      LdefB
         mov     ecx, dword ptr [edx]INO_tdstDevice.p_stState
-        lea     edi, [eax*4 + INO_pc_tdstJoyState.a_lAxis]
+        lea     edi, [eax*4]INO_pc_tdstJoyState.a_lAxis
         fild    dword ptr [ecx + edi]
         mov     ecx, dword ptr [edx]INO_tdstDevice.p_stCaps
         lea     edi, [eax + eax*2]
-        lea     edi, [edi*4]INO_pc_tdstAxisDeviceCaps.a_stAxis.m_lRange
+        lea     edi, [edi*4 + IPT_C_lAxisCapsRangeOffset]
         fidiv   dword ptr [ecx + edi]
         jmp     LaftB
     LdefB:
@@ -1118,7 +1120,7 @@ IPT_fn_bIsKeyWordValid_JoystickCorrectedNormValue(IPT_tdstKeyWordElement *_hKeyW
         fstp    dword ptr [ecx]IPT_tdstEntryElement.xAnalogicValue
         mov     esi, dword ptr [IPT_g_hNextParameter]
     Lcexit:
-        add     esi, TYPE IPT_tdstKeyWordElement
+        add     esi, IPT_C_KeyWordElementSize
         mov     dword ptr [IPT_g_hNextParameter], esi
         pop     edi
         pop     esi
@@ -1128,7 +1130,7 @@ IPT_fn_bIsKeyWordValid_JoystickCorrectedNormValue(IPT_tdstKeyWordElement *_hKeyW
         ret
     Lcfail:
         xor     al, al
-        add     esi, TYPE IPT_tdstKeyWordElement
+        add     esi, IPT_C_KeyWordElementSize
         mov     dword ptr [IPT_g_hNextParameter], esi
         pop     edi
         pop     esi
@@ -1165,13 +1167,12 @@ void __cdecl IPT_pc_fn_vCreateMouseDevice(long _lParam)
 __declspec(naked) unsigned char __cdecl
 IPT_fn_bIsKeyWordValid_MouseAxeValue(IPT_tdstKeyWordElement *_hKeyWordElement)
 {
-    (void)_hKeyWordElement;
     __asm {
         mov     eax, dword ptr [IPT_pc_g_bMouseEnabled]
         test    eax, eax
         jnz     Lactive
         mov     eax, dword ptr [esp + 0x4]
-        add     eax, 4*TYPE IPT_tdstKeyWordElement
+        add     eax, 4*IPT_C_KeyWordElementSize
         mov     dword ptr [IPT_g_hNextParameter], eax
         xor     al, al
         ret
@@ -1180,15 +1181,15 @@ IPT_fn_bIsKeyWordValid_MouseAxeValue(IPT_tdstKeyWordElement *_hKeyWordElement)
         push    edi
         push    esi
         mov     ecx, dword ptr IPT_g_hInputStructure.a_hINODevice[IPT_E_MouseDeviceEvent*4]
-        lea     esi, [edx + TYPE IPT_tdstKeyWordElement]
+        lea     esi, [edx + IPT_C_KeyWordElementSize]
         mov     dl, byte ptr IPT_g_hInputStructure.p_ucValideAndActiveDevice[IPT_E_MouseDeviceEvent]
         mov     dword ptr [IPT_g_hNextParameter], esi
         push    ebx
         movsx   eax, word ptr [esi]IPT_tdstKeyWordElement.u_ElementUnion.swValue
-        add     esi, TYPE IPT_tdstKeyWordElement
+        add     esi, IPT_C_KeyWordElementSize
         mov     dword ptr [IPT_g_hNextParameter], esi
         movsx   edi, word ptr [esi]IPT_tdstKeyWordElement.u_ElementUnion.swValue
-        add     esi, TYPE IPT_tdstKeyWordElement
+        add     esi, IPT_C_KeyWordElementSize
         cmp     dl, IPT_C_ActivateMouseDevice
         mov     dword ptr [IPT_g_hNextParameter], esi
         movsx   ebx, word ptr [esi]IPT_tdstKeyWordElement.u_ElementUnion.swValue
@@ -1234,13 +1235,13 @@ IPT_fn_bIsKeyWordValid_MouseAxeValue(IPT_tdstKeyWordElement *_hKeyWordElement)
         pop     ebx
         fstp    dword ptr [ecx]IPT_tdstEntryElement.xAnalogicValue
         mov     esi, dword ptr [IPT_g_hNextParameter]
-        add     esi, TYPE IPT_tdstKeyWordElement
+        add     esi, IPT_C_KeyWordElementSize
         mov     dword ptr [IPT_g_hNextParameter], esi
         pop     esi
         pop     edi
         ret
     Lng:
-        add     esi, TYPE IPT_tdstKeyWordElement
+        add     esi, IPT_C_KeyWordElementSize
         pop     ebx
         mov     dword ptr [IPT_g_hNextParameter], esi
         pop     esi
@@ -1254,7 +1255,6 @@ IPT_fn_bIsKeyWordValid_MouseAxeValue(IPT_tdstKeyWordElement *_hKeyWordElement)
 __declspec(naked) unsigned char __cdecl
 IPT_fn_bIsKeyWordValid_MouseAxePosition(IPT_tdstKeyWordElement *_hKeyWordElement)
 {
-    (void)_hKeyWordElement;
     __asm {
         mov     eax, dword ptr [IPT_pc_g_bMouseEnabled]
         push    ebx
@@ -1262,7 +1262,7 @@ IPT_fn_bIsKeyWordValid_MouseAxePosition(IPT_tdstKeyWordElement *_hKeyWordElement
         test    eax, eax
         jnz     Lactive
         mov     eax, dword ptr [esp + 0x8]
-        add     eax, 4*TYPE IPT_tdstKeyWordElement
+        add     eax, 4*IPT_C_KeyWordElementSize
         mov     dword ptr [IPT_g_hNextParameter], eax
         xor     al, al
         pop     ebx
@@ -1270,10 +1270,10 @@ IPT_fn_bIsKeyWordValid_MouseAxePosition(IPT_tdstKeyWordElement *_hKeyWordElement
     Lactive:
         mov     ecx, dword ptr [esp + 0x8]
         mov     edx, dword ptr IPT_g_hInputStructure.a_hINODevice[IPT_E_MouseDeviceEvent*4]
-        lea     eax, [ecx + TYPE IPT_tdstKeyWordElement]
+        lea     eax, [ecx + IPT_C_KeyWordElementSize]
         mov     dword ptr [IPT_g_hNextParameter], eax
         movsx   ecx, word ptr [eax]IPT_tdstKeyWordElement.u_ElementUnion.swValue
-        add     eax, 2*TYPE IPT_tdstKeyWordElement
+        add     eax, 2*IPT_C_KeyWordElementSize
         mov     dword ptr [IPT_g_hNextParameter], eax
         mov     al, byte ptr IPT_g_hInputStructure.p_ucValideAndActiveDevice[IPT_E_MouseDeviceEvent]
         cmp     al, IPT_C_ActivateMouseDevice
@@ -1306,7 +1306,7 @@ IPT_fn_bIsKeyWordValid_MouseAxePosition(IPT_tdstKeyWordElement *_hKeyWordElement
         mov     edx, dword ptr [IPT_g_h_ActualEntryInput]
         fstp    dword ptr [edx]IPT_tdstEntryElement.xAnalogicValue
         mov     eax, dword ptr [IPT_g_hNextParameter]
-        add     eax, TYPE IPT_tdstKeyWordElement
+        add     eax, IPT_C_KeyWordElementSize
         mov     dword ptr [IPT_g_hNextParameter], eax
         mov     al, bl
         pop     ebx
