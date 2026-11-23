@@ -225,7 +225,7 @@ void __cdecl GAM_pc_fn_vReadExternalCtrlLevelNames(void)
         if (ulTag == 0x1f)
         {
             GAM_pc_fn_vReadExternalCtrlLengthPrefixedBytes(szName);
-            if (GAM_g_b500371 == 0 &&
+            if (g_cIsLevelOk == 0 &&
                 (GAM_g_stEngineStructure.ucNumberOfLevels == GAM_g_stEngineStructure.ucCurrentLevel ||
                  GAM_g_stEngineStructure.ucNumberOfLevels == 0))
             {
@@ -564,7 +564,7 @@ extern void __cdecl GLI_FatalExitOrSleep(void);   /* 0x004011C0 */
     __asm _emit 0x90 __asm _emit 0x90 __asm _emit 0x90 __asm _emit 0x90 \
     __asm _emit 0x90 __asm _emit 0x90 __asm _emit 0x90 __asm _emit 0x90
 
-__declspec(naked) void __cdecl FUN_00405850(void)
+__declspec(naked) void __cdecl GAM_pc_fn_vLoadGliDll(void)
 {
     __asm {
         push    ebp
@@ -580,7 +580,7 @@ __declspec(naked) void __cdecl FUN_00405850(void)
         ret
 L_gate:
         push    edi
-        mov     byte ptr [GAM_g_b500371], 0
+        mov     byte ptr [g_cIsLevelOk], 0
 L_body:
         GAM_pc_M_vNop8 GAM_pc_M_vNop8 GAM_pc_M_vNop8 GAM_pc_M_vNop8 GAM_pc_M_vNop8
         GAM_pc_M_vNop8 GAM_pc_M_vNop8 GAM_pc_M_vNop8 GAM_pc_M_vNop8 GAM_pc_M_vNop8
@@ -1089,7 +1089,7 @@ void FUN_00403690(void)
 
     FUN_00492860();
     FUN_00405a30();
-    FUN_00405850();
+    GAM_pc_fn_vLoadGliDll();
 
     GAM_g_stEngineStructure.eEngineMode = E_EM_ModeStartingProgram;
 
