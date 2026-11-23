@@ -27,9 +27,10 @@ The full program builds, links and runs. It is not yet byte-identical to retail.
 
 `/* 0x00XXXXXX */` comments give the retail address of the function or global they sit next to.
 
-## Building
+## Documentation
 
-See [BUILDING.md](BUILDING.md).
+- [BUILDING.md](BUILDING.md): toolchain, build, byte-matching tools
+- [docs/architecture.md](docs/architecture.md): engine structure, toolchain and link facts, method
 
 ## Legal
 
