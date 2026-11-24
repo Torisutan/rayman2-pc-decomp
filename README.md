@@ -59,6 +59,44 @@ The full program builds, links and runs. It is not yet byte-identical to retail.
 - A byte-identical exe needs the remaining functions first, then the retail layout (link order,
   data order).
 
+## GliDX6vf.dll
+
+Rayman 2 draws through a separate renderer DLL. `GliDX6vf.dll` is its Direct3D 6 driver (DirectDraw 4
+surfaces, a Direct3D 3 device, `DrawPrimitive` with transformed and lit vertices). The game loads it
+from `DLL/GliDX6vf.dll` with `LoadLibrary` and resolves the exported `GLI_DRV_*` functions by name:
+that export set is the whole interface between exe and driver. The exe tells the driver which
+helpers and buffers to use through `GLI_DRV_lSetCommonData` / `GLI_DRV_lSetCommonFct` and then
+drives it frame by frame.
+
+Which renderer the game uses is set in its `ubi.ini`; the exe loads `DLL/<GLI_DllFile>vf.dll`. To use
+this one:
+
+```
+GLI_DllFile=GliDX6
+GLI_Dll=DirectX6
+GLI_Driver=display
+GLI_Device=Direct3D HAL
+```
+
+On Windows 10 with the native DirectDraw, the game only finds its 16-bit display modes when started
+with the compatibility layer `DWM8And16BitMitigation` (for example `set __COMPAT_LAYER=DWM8And16BitMitigation`
+before launching it); a DirectDraw wrapper works too.
+
+| Source | Contents |
+|---|---|
+| `GliDX6vf.dll/src/driver/` | The `GLI_DRV_*` entry points: init/close, activation, display modes, DLL info, common data from the exe |
+| `GliDX6vf.dll/src/device/` | DirectDraw / Direct3D device: creation and reset, surfaces, caps, clear, flip, lock, windowed/full-screen |
+| `GliDX6vf.dll/src/texture/` | Texture formats, upload (with mipmaps, palettes, colour keys), pixel conversion, texture memory cost |
+| `GliDX6vf.dll/src/render/` | Scene begin/end, cached render states (Z, fog, blending, alpha), fog, black polygons |
+| `GliDX6vf.dll/src/clip/` | The clipping pipeline (near plane and screen edges), triangle/sprite/line submission, the sorted list of transparent polygons |
+| `GliDX6vf.dll/src/core/` | Global state |
+| `GliDX6vf.dll/include/GliDX6vf/` | Exports and internal prototypes, global state, Direct3D constants |
+
+`tools/build_glidx6.py` builds the original driver with the retail toolchain; copy the result over
+`DLL/GliDX6vf.dll` (keep a backup) to run the game with it ([BUILDING.md](BUILDING.md)). Code under
+`#ifdef GLI_DX6_FIXES` is not part of the original driver (Windows 10 activation handling, NULL
+guards, a display-mode fallback, an optional diagnostic log); the byte-match build leaves it out.
+
 ## Layout
 
 | Path | Contents |
