@@ -6,7 +6,7 @@ MD5 `ef4954015d8b67e3534c9dc40ca3ad6e`). The goal is C source that rebuilds a **
 
 ## Status
 
-**`Rayman2.exe`**: the census of the retail code section (0x00401000..0x0049C000, 2026-11-24) finds **3166 functions**. 65 are library code (C runtime, import thunks) that the linker supplies; the other **3101 are game code, and all of them have C source**. **2685 are byte-exact** (86.6%; 59% of the 595,053 bytes of game code) and 416 are not yet.
+**`Rayman2.exe`**: the census of the retail code section (0x00401000..0x0049C000, 2026-11-24) finds **3166 functions**. 65 are library code (C runtime, import thunks) that the linker supplies; the other **3101 are game code, and all of them have C source**. **2685 are byte-exact** (86.6%; 59% of the 595,051 bytes of game code) and 416 are not yet.
 
 The source holds 3267 C functions (`Rayman2.exe/status.json`): where the linker folded identical functions into one retail function, each C function is listed with that address.
 
@@ -43,6 +43,8 @@ The source holds 3267 C functions (`Rayman2.exe/status.json`): where the linker 
 | SPO | 1 | 1 |
 
 **`GliDX6vf.dll`** (the Direct3D 6 renderer the game loads): every one of its 130 functions has C source; **103 are byte-exact** (43% of its 41,153 code bytes), 1 is a recorded floor (the shipped DLL was patched after linking: the C reproduces the linked original) and 26 are not yet byte-exact (per-function list: `GliDX6vf.dll/status.json`). The DLL builds with the retail toolchain and runs the game.
+
+**`WAVMWBVR.dll`** (the sound driver the game loads on any MMX CPU): every one of its 767 C functions has source and the hand-written MMX mixer is reassembled from MASM; **758 are byte-exact** (88% of 42,930 C code bytes) and 9 are not yet (per-function list: `WAVMWBVR.dll/status.json`). The data layout and headers match the original; the DLL builds with the retail toolchain.
 
 The full program builds, links and runs. It is not yet byte-identical to retail.
 
@@ -97,6 +99,29 @@ before launching it); a DirectDraw wrapper works too.
 `#ifdef GLI_DX6_FIXES` is not part of the original driver (Windows 10 activation handling, NULL
 guards, a display-mode fallback, an optional diagnostic log); the byte-match build leaves it out.
 
+## WAVMWBVR.dll
+
+All game sound goes through a sound driver DLL that the exe picks from `DLL/SND_CPA.INI`: on any CPU
+with MMX that is `WAVMWBVR.dll` (software mixer, the 3D sample layer, `waveOut` output on its own
+thread). The exe resolves its exported `SND_fn_*SxdWave` functions by name; the DLL in turn calls
+back into the exe's exported sound library through `GetProcAddress`.
+
+| Source | Contents |
+|---|---|
+| `WAVMWBVR.dll/src/snddll.c` | Stubs for the exe's sound library entry points, loaded with `GetProcAddress` |
+| `WAVMWBVR.dll/src/Win95/` | Streamed samples and transition streaming |
+| `WAVMWBVR.dll/src/sndvirt.c` | Virtual voices |
+| `WAVMWBVR.dll/src/sndwave.c` | Sample layer: voices, mix loops, reverb filter design, the `waveOut` thread, buffer clients |
+| `WAVMWBVR.dll/src/pc_mixervol.c` | Volume through the Windows mixer |
+| `WAVMWBVR.dll/src/Sndxd.c`, `sndxdwav.c` | The 3D sample layer and the exported `*SxdWave` interface |
+| `WAVMWBVR.dll/src/mixer/` | The MMX mixer, hand-written assembly (MASM) |
+| `WAVMWBVR.dll/src/WAVMWBVR.rc` | Version resource |
+
+`tools/build_wavmw.py` builds it with the retail toolchain (plus ML 6.1x for the mixer); copy the
+result over `DLL/WAVMWBVR.dll` (keep a backup) to run the game with it ([BUILDING.md](BUILDING.md)).
+Several names of uninitialized globals end in a number: the linker orders those globals by the
+compiler's name hash, and the suffix reproduces the original data layout.
+
 ## Layout
 
 | Path | Contents |
@@ -110,8 +135,11 @@ guards, a display-mode fallback, an optional diagnostic log); the byte-match bui
 | `Rayman2.exe/crack.json` | Translation tables for the post-link crack step |
 | `GliDX6vf.dll/src/`, `include/` | The Direct3D 6 renderer DLL the game loads (`DLL/GliDX6vf.dll`) |
 | `GliDX6vf.dll/tu.json`, `status.json` | The DLL's link order and flags; each function's retail address, size, source file and verdict |
+| `WAVMWBVR.dll/src/`, `include/` | The sound driver DLL the game loads (`DLL/WAVMWBVR.dll`) |
+| `WAVMWBVR.dll/tu.json`, `status.json` | Its link order, compiler/assembler/linker flags and libraries; each function's retail address, size, source file and verdict |
 | `tools/build.py` | Retail-toolchain build (`--crack` also writes a runnable cracked copy) |
 | `tools/build_glidx6.py` | Retail-toolchain build of `GliDX6vf.dll` (`--check` compares it with your DLL) |
+| `tools/build_wavmw.py` | Retail-toolchain build of `WAVMWBVR.dll` (`--check` compares it with your DLL) |
 | `tools/check.py`, `tools/byte_match.py` | Byte comparison against retail: whole exe, or one function with an asm diff |
 | `tools/crack.py` | Post-link crack step |
 
