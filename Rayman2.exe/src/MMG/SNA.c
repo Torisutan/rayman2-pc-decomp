@@ -130,9 +130,9 @@ unsigned char __cdecl SNA_pc_bOpenFile(const char *_szPath, char _cMode,
                                        unsigned char _ucFlags, void *_p_stFile)
 {
     SNA_pc_tdstStream *p_stStream;
-    DWORD  dwDesiredAccess;
-    DWORD  dwCreationDisposition;
-    DWORD  dwAttrs;
+    unsigned long ulAccess;
+    unsigned long ulCreation;
+    unsigned long ulAttributes;
     HANDLE hFile;
     unsigned char *p_ucStub;
     unsigned char *p_ucEnd;
@@ -143,16 +143,16 @@ unsigned char __cdecl SNA_pc_bOpenFile(const char *_szPath, char _cMode,
 
     switch ((unsigned char)_cMode) {
     case 1:
-        dwCreationDisposition = 2;
-        dwDesiredAccess       = 0x40000000;
-        dwAttrs = SNA_pc_M_ulGetFileAttributes(_szPath);
-        if ((dwAttrs & 1) != 0) {
-            SNA_pc_M_bSetFileAttributes(_szPath, dwAttrs & 0xFFFFFFFEu);
+        ulCreation = SNA_pc_C_ulCreateAlways;
+        ulAccess   = SNA_pc_C_ulAccessWrite;
+        ulAttributes = SNA_pc_M_ulGetFileAttributes(_szPath);
+        if ((ulAttributes & SNA_pc_C_ulAttributeReadOnly) != 0) {
+            SNA_pc_M_bSetFileAttributes(_szPath, ulAttributes & ~SNA_pc_C_ulAttributeReadOnly);
         }
         break;
     case 2:
-        dwCreationDisposition = 3;
-        dwDesiredAccess       = 0x80000000;
+        ulCreation = SNA_pc_C_ulOpenExisting;
+        ulAccess   = SNA_pc_C_ulAccessRead;
         break;
     default:
         __asm int 3
@@ -166,7 +166,7 @@ unsigned char __cdecl SNA_pc_bOpenFile(const char *_szPath, char _cMode,
         MMG_pc_M_vWriteStub(p_ucStub, MMG_pc_C_ImpCreateFileA, 0xFF, 0xE0);
         MMG_pc_M_vFlushPool(hProcess);
         hFile = ((HANDLE (__stdcall *)(LPCSTR, DWORD, DWORD, LPSECURITY_ATTRIBUTES, DWORD, DWORD, HANDLE))
-                 p_ucStub)(_szPath, dwDesiredAccess, 0, NULL, dwCreationDisposition,
+                 p_ucStub)(_szPath, ulAccess, 0, NULL, ulCreation,
                            0x80  , NULL);
         for (p_ucEnd = p_ucStub + MMG_pc_C_StubSize; p_ucStub < p_ucEnd; p_ucStub++) {
             MMG_pc_M_vStepLcg();
@@ -174,10 +174,10 @@ unsigned char __cdecl SNA_pc_bOpenFile(const char *_szPath, char _cMode,
         }
         p_stStream->hFile = hFile;
     } else {
-        p_stStream->hFile = SNA_pc_M_hOpenFile(_szPath, dwDesiredAccess, dwCreationDisposition,
-                                               0x80  );
+        p_stStream->hFile = SNA_pc_M_hOpenFile(_szPath, ulAccess, ulCreation,
+                                               SNA_pc_C_ulAttributeNormal);
     }
-    p_stStream->ulValid = (p_stStream->hFile != INVALID_HANDLE_VALUE);
+    p_stStream->ulValid = (p_stStream->hFile != SNA_pc_C_hInvalidFile);
     return (unsigned char)p_stStream->ulValid;
 }
 
@@ -189,7 +189,7 @@ unsigned char __cdecl SNA_pc_bCloseFile(void *_p_stFile)
     unsigned char *p_ucEnd;
     void *hProcess;
     HANDLE hFile;
-    BOOL bOk;
+    long bOk;
 
     p_stStream->ucCarryUsed = 0;
     if (SNA_pc_bGetFlagBit2(_p_stFile) != 0) {
@@ -207,11 +207,11 @@ unsigned char __cdecl SNA_pc_bCloseFile(void *_p_stFile)
             MMG_pc_M_vStepLcg();
             *p_ucStub = (unsigned char)((int)MMG_g_ulLCGState % 0xff);
         }
-        p_stStream->hFile = INVALID_HANDLE_VALUE;
+        p_stStream->hFile = SNA_pc_C_hInvalidFile;
         return (unsigned char)(bOk == 0);
     }
     bOk = SNA_pc_M_bCloseFile(p_stStream->hFile);
-    p_stStream->hFile = INVALID_HANDLE_VALUE;
+    p_stStream->hFile = SNA_pc_C_hInvalidFile;
     return (unsigned char)(bOk == 0);
 }
 
@@ -220,12 +220,12 @@ unsigned char __cdecl SNA_pc_bRawReadPlain(void *_p_vBuffer, size_t _ulBytes,
                                            void *_p_stFile)
 {
     SNA_pc_tdstStream *p_stStream = (SNA_pc_tdstStream *)_p_stFile;
-    DWORD     dwBytesRead;
-    BOOL      bOk;
+    unsigned long ulBytesRead;
+    long      bOk;
 
-    bOk = SNA_pc_M_bReadFile(p_stStream->hFile, _p_vBuffer, (DWORD)_ulBytes, &dwBytesRead);
+    bOk = SNA_pc_M_bReadFile(p_stStream->hFile, _p_vBuffer, (unsigned long)_ulBytes, &ulBytesRead);
     p_stStream->ulValid = (unsigned long)bOk;
-    return (unsigned char)(dwBytesRead == (DWORD)_ulBytes);
+    return (unsigned char)(ulBytesRead == (unsigned long)_ulBytes);
 }
 
 /* 0x00451090 */
@@ -235,12 +235,12 @@ unsigned char __cdecl SNA_pc_bRawReadDecode(void *_p_vBuffer, size_t _ulBytes,
     unsigned char *p_ucBuffer = (unsigned char *)_p_vBuffer;
     unsigned char *p_ucEnd    = p_ucBuffer + _ulBytes;
     SNA_pc_tdstStream *p_stStream = (SNA_pc_tdstStream *)_p_stFile;
-    DWORD          dwBytesRead;
-    BOOL           bOk;
+    unsigned long  ulBytesRead;
+    long           bOk;
 
-    bOk = SNA_pc_M_bReadFile(p_stStream->hFile, _p_vBuffer, (DWORD)_ulBytes, &dwBytesRead);
+    bOk = SNA_pc_M_bReadFile(p_stStream->hFile, _p_vBuffer, (unsigned long)_ulBytes, &ulBytesRead);
     p_stStream->ulValid = (unsigned long)bOk;
-    if (dwBytesRead != (DWORD)_ulBytes) {
+    if (ulBytesRead != (unsigned long)_ulBytes) {
         return 0;
     }
 
@@ -325,7 +325,7 @@ unsigned char __cdecl SNA_pc_bRawReadPlainStubbed(void *_p_vBuffer, size_t _ulBy
 unsigned long __cdecl SNA_pc_ulSeek(void *_p_stFile, long _lDistance, int _iOrigin)
 {
     SNA_pc_tdstStream *p_stStream = (SNA_pc_tdstStream *)_p_stFile;
-    DWORD          dwMoveMethod;
+    unsigned long  ulOrigin;
     long           lDistance = _lDistance;
     unsigned char *p_ucStub;
     unsigned char *p_ucEnd;
@@ -350,9 +350,9 @@ unsigned long __cdecl SNA_pc_ulSeek(void *_p_stFile, long _lDistance, int _iOrig
     }
 
     if (_iOrigin == 0) {
-        dwMoveMethod = 0;
+        ulOrigin = SNA_pc_C_ulSeekBegin;
     } else {
-        dwMoveMethod = (DWORD)(_iOrigin == 2) + 1;
+        ulOrigin = (_iOrigin == 2) ? SNA_pc_C_ulSeekEnd : SNA_pc_C_ulSeekCurrent;
     }
     if (SNA_pc_bGetFlagBit2(_p_stFile) != 0) {
 
@@ -362,12 +362,12 @@ unsigned long __cdecl SNA_pc_ulSeek(void *_p_stFile, long _lDistance, int _iOrig
         MMG_pc_M_vWriteStub(p_ucStub, MMG_pc_C_ImpSetFilePointer, 0x50, 0xC3);
         MMG_pc_M_vFlushPool(hProcess);
         dwResult = ((DWORD (__stdcall *)(HANDLE, LONG, PLONG, DWORD))p_ucStub)(
-            hFile, _lDistance, NULL, dwMoveMethod);
+            hFile, _lDistance, NULL, ulOrigin);
         for (p_ucEnd = p_ucStub + MMG_pc_C_StubSize; p_ucStub < p_ucEnd; p_ucStub++) {
             MMG_pc_M_vStepLcg();
             *p_ucStub = (unsigned char)((int)MMG_g_ulLCGState % 0xff);
         }
         return dwResult;
     }
-    return SNA_pc_M_ulSeekFile(p_stStream->hFile, _lDistance, dwMoveMethod);
+    return SNA_pc_M_ulSeekFile(p_stStream->hFile, _lDistance, ulOrigin);
 }
