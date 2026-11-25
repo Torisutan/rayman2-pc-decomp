@@ -45,9 +45,12 @@ ARG = "wav"             # calls configure() for APMmxBVR.dll); ARG = the option 
 DLL_DIR = SRC = INC = OUT = None
 
 
-def configure(name, arg):
-    global NAME, ARG, DLL_DIR, SRC, INC, OUT
-    NAME, ARG = name, arg
+ML = "ml"               # the option naming the assembler (tools/build_apmmx.py: ml611d)
+
+
+def configure(name, arg, ml="ml"):
+    global NAME, ARG, ML, DLL_DIR, SRC, INC, OUT
+    NAME, ARG, ML = name, arg, ml
     DLL_DIR = os.path.join(build.ROOT, name + ".dll")
     SRC = os.path.join(DLL_DIR, "src")
     INC = os.path.join(DLL_DIR, "include")
@@ -91,7 +94,7 @@ def build_one(a, cfg, entry, out):
     if src.endswith(".c"):
         cmd = [os.path.join(a.vc5, "bin", "cl.exe")] + cfg["base_flags"] + ["/Fo" + obj, path]
     elif src.endswith(".asm"):
-        cmd = [a.ml, "/nologo", "/c", "/Cp"] + cfg["asm_flags"] + ["/Fo" + obj, path]
+        cmd = [getattr(a, ML), "/nologo", "/c", "/Cp"] + cfg["asm_flags"] + ["/Fo" + obj, path]
     elif src.endswith(".rc"):
         cmd = [os.path.join(a.vc5, "bin", "rc.exe"), "/fo" + obj, path]
     else:
@@ -214,12 +217,12 @@ def check(a, out, cfg):
 def main(doc=__doc__):
     ap = argparse.ArgumentParser(description=doc, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--vc5")
-    ap.add_argument("--ml", help="ml.exe 6.1x")
+    ap.add_argument("--" + ML, help="ml.exe (%s)" % ("6.1x" if ML == "ml" else ML[2:]))
     ap.add_argument("--" + ARG, help="your game's %s.dll (for --check and the header fields)" % NAME)
     ap.add_argument("--check", action="store_true")
     ap.add_argument("--out", default=OUT)
     ap.add_argument("--jobs", type=int, default=6)
-    a = build.resolve_paths(ap.parse_args(), need=("vc5", "ml") + ((ARG,) if "--check" in sys.argv else ()))
+    a = build.resolve_paths(ap.parse_args(), need=("vc5", ML) + ((ARG,) if "--check" in sys.argv else ()))
     out = os.path.abspath(a.out)
     cfg = load_cfg()
     entries = cfg["link_order"]

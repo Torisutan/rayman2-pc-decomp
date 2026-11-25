@@ -139,7 +139,7 @@ back into the exe through `GetProcAddress`.
 | `APMmxBVR.dll/src/mmx/` | The MMX decoder/mixer kernels and the IMA ADPCM tables, hand-written assembly (MASM) |
 | `APMmxBVR.dll/src/APMmxBVR.rc` | Version resource |
 
-`tools/build_apmmx.py` builds it with the retail toolchain (plus ML 6.1x); copy the result over
+`tools/build_apmmx.py` builds it with the retail toolchain (plus ML 6.11d); copy the result over
 `DLL/APMmxBVR.dll` (keep a backup) to run the game with it ([BUILDING.md](BUILDING.md)).
 
 ## Layout
