@@ -13,6 +13,7 @@
 #include <windows.h>
 #include "GLD/GLD_Pub.h"
 #include "GLD/Specif/DevVpt.h"
+#include "GAM/GAM_pc_DrawLock.h"
 
 static void *GLD_pc_gs_a_pDeviceTable[16];
 #define GLD_pc_g_a_pDeviceTable (GLD_pc_gs_a_pDeviceTable)
@@ -1301,7 +1302,7 @@ void __cdecl fn_vChangeViewPortPercent(
     GLD_tdstViewportAttributes  stViewAttrib;
     struct GLI_tdstCamera_      *p_stCam;
 
-    WaitForSingleObject(GAM_g_stEngineStructure.hDrawSem, INFINITE);
+    GAM_pc_M_ulWaitDrawSemaphore(GAM_g_stEngineStructure.hDrawSem);
 
   {
 
@@ -1350,7 +1351,7 @@ void __cdecl fn_vChangeViewPortPercent(
     }
     }
 
-    ReleaseSemaphore(GAM_g_stEngineStructure.hDrawSem, 1, NULL);
+    GAM_pc_M_bReleaseDrawSemaphore(GAM_g_stEngineStructure.hDrawSem);
 }
 
 long __cdecl _ftol(void);

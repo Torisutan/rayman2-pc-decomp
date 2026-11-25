@@ -30,7 +30,9 @@
 
 #define Mmg_fn_p_vAlloc4Ch(ulSize, ucChannel) fn_p_vGenAlloc((ulSize), (ucChannel))
 
+#define Mmg_MCreateCriticalSection() InitializeCriticalSection (&g_csMmg)
 #define Mmg_MEnterCriticalSection() EnterCriticalSection (&g_csMmg)
 #define Mmg_MLeaveCriticalSection() LeaveCriticalSection (&g_csMmg)
+#define Mmg_MDeleteCriticalSection() DeleteCriticalSection (&g_csMmg)
 
 #endif

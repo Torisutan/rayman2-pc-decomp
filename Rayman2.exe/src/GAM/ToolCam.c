@@ -10,6 +10,7 @@
 #include "GLI/Camera.h"
 #include "GLI/Init_Gli_helpers.h"
 #include "GAM/GAM_globals.h"
+#include "GAM/GAM_pc_DrawLock.h"
 
 #include "GAM/ToolCam.h"
 
@@ -191,7 +192,7 @@ void __cdecl CAM_fn_vActualizeAViewport(long _lViewport)
     POS_fn_vSetRotationMatrix( &stMatrix, &I, &K, &J );
     POS_fn_vInvertIsoMatrix( &stMatrix, &stMatrix );
 
-    WaitForSingleObject(CAM_g_hDrawSemaphore, INFINITE);
+    GAM_pc_M_ulWaitDrawSemaphore(CAM_g_hDrawSemaphore);
 
     p_Camera = hViewport->p_stCamera;
     GLI_p_xSetCameraMatrix( p_Camera, &stMatrix );
@@ -210,7 +211,7 @@ void __cdecl CAM_fn_vActualizeAViewport(long _lViewport)
     else
         GLI_p_xSetViewportCamera(CAM_g_uwDeviceWord, CAM_g_uwDisplayState, p_Camera);
 
-    ReleaseSemaphore(CAM_g_hDrawSemaphore, 1, NULL);
+    GAM_pc_M_bReleaseDrawSemaphore(CAM_g_hDrawSemaphore);
 }
 
 ACP_tdxBool __cdecl CAM_fn_bSuperObjectIsACamera(HIE_tdstSuperObject *hSuperObj)

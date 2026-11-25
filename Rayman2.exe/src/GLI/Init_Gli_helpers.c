@@ -11,6 +11,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
+#include "FIL/FIL_pc.h"
 
 #include "GLI/sprite.h"
 void __cdecl GLI_vInitLensFlare (void)
@@ -166,7 +167,7 @@ void __cdecl GLI_pc_fn_vReadIniString(const char *szSection, const char *szKey,
     char acPath[260];
     GetWindowsDirectoryA(acPath, sizeof(acPath));
     strcat(acPath, GLI_PC_UBIINI_NAME);
-    GetPrivateProfileStringA(szSection, szKey, szReturnBuf, szReturnBuf, ulSize, acPath);
+    FIL_pc_M_ulGetProfileString(szSection, szKey, szReturnBuf, szReturnBuf, ulSize, acPath);
 }
 
 void __cdecl GLI_pc_fn_vWriteIniString(const char *szSection, const char *szKey,
@@ -175,7 +176,7 @@ void __cdecl GLI_pc_fn_vWriteIniString(const char *szSection, const char *szKey,
     char acPath[260];
     GetWindowsDirectoryA(acPath, sizeof(acPath));
     strcat(acPath, GLI_PC_UBIINI_NAME);
-    WritePrivateProfileStringA(szSection, szKey, szValue, acPath);
+    FIL_pc_M_bWriteProfileString(szSection, szKey, szValue, acPath);
 }
 
 /* 0x00409c80 */

@@ -7,6 +7,7 @@
 
 #include "MMG/SNA_reloc.h"
 #include "MMG/SNA.h"
+#include "MMG/SNA_pc.h"
 #include "MMG/MMG_pubaccess.h"
 #include "MMG/MMG_globals.h"
 #include "GAM/GAM_types.h"
@@ -407,7 +408,7 @@ int __cdecl SNA_pc_vLoadAndRelocate(char *_szFile)
         }
     }
 
-    iReadOk = ReadFile(((SNA_pc_tdstStream *)a_ucStream)->hFile, &ulMainHeader, 4, &dwRead, NULL);
+    iReadOk = SNA_pc_M_bReadFile(((SNA_pc_tdstStream *)a_ucStream)->hFile, &ulMainHeader, 4, &dwRead);
 
     if (SNA_g_pGptContext != NULL) {
         SNA_pc_vFreeGptTable(SNA_g_pGptContext);
@@ -523,7 +524,7 @@ int __cdecl SNA_pc_vLoadAndRelocate(char *_szFile)
     return 1;
 }
 
-HANDLE SNA_g_hGptFile;   /* 0x005149BC */
+SNA_pc_tdhFile SNA_g_hGptFile;   /* 0x005149BC */
 FILE  *SNA_g_pSndFile;   /* 0x005149B8 */
 
 static const char SNA_C_szModeRb[] = "rb";   /* 0x0049F75C */
@@ -534,7 +535,7 @@ extern void *__stdcall SND_fn_pGetBinEvent(unsigned long ulBinId);
 /* 0x0044CFA0 */
 void __cdecl SNA_pc_vRawReadGptFile(void *_p_vBuffer, unsigned long _dwBytes)
 {
-    ReadFile(SNA_g_hGptFile, _p_vBuffer, _dwBytes, &_dwBytes, (LPOVERLAPPED)0);
+    SNA_pc_M_bReadFile(SNA_g_hGptFile, _p_vBuffer, _dwBytes, &_dwBytes);
 }
 
 /* 0x0044CD60 */
@@ -543,22 +544,19 @@ void __cdecl SNA_pc_vOpenGptFile(char *_szPath)
     char a_cTemp[256];
 
     SNA_pc_vInitLoadLists();
-    SNA_g_hGptFile = CreateFileA(_szPath, GENERIC_READ, 0, (LPSECURITY_ATTRIBUTES)0,
-                                 OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, (HANDLE)0);
+    SNA_g_hGptFile = SNA_pc_M_hOpenFile(_szPath, GENERIC_READ, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL);
     if (SNA_g_hGptFile == INVALID_HANDLE_VALUE) {
         strcpy(a_cTemp, _szPath);
         sprintf(_szPath, SNA_C_szFmtCd, (int)SNA_g_cCdDriveLetter, a_cTemp);
-        SNA_g_hGptFile = CreateFileA(_szPath, GENERIC_READ, 0, (LPSECURITY_ATTRIBUTES)0,
-                                     OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, (HANDLE)0);
+        SNA_g_hGptFile = SNA_pc_M_hOpenFile(_szPath, GENERIC_READ, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL);
         while (SNA_g_hGptFile == INVALID_HANDLE_VALUE) {
             int iResponse = SNA_p_iAskInsertCd(SNA_C_szInsertCd,
                                                SNA_C_szInsertCd, 0x40035);
             if (iResponse == 2) {
                 SNA_p_vOnCdPromptAbort();
             }
-            SNA_g_hGptFile = CreateFileA(_szPath, GENERIC_READ, 0,
-                                         (LPSECURITY_ATTRIBUTES)0, OPEN_EXISTING,
-                                         FILE_ATTRIBUTE_NORMAL, (HANDLE)0);
+            SNA_g_hGptFile = SNA_pc_M_hOpenFile(_szPath, GENERIC_READ, OPEN_EXISTING,
+                                                FILE_ATTRIBUTE_NORMAL);
         }
         strcpy(_szPath, a_cTemp);
     }
@@ -676,7 +674,7 @@ void __cdecl SNA_pc_vCloseGptFile(void)
         SNA_pc_vFreeGptTable(SNA_g_pGptContext);
     }
     SNA_g_pGptContext = NULL;
-    CloseHandle(SNA_g_hGptFile);
+    SNA_pc_M_bCloseFile(SNA_g_hGptFile);
     SNA_p_vProgress(1);
     SNA_g_pRelocCursorEnd = NULL;
     SNA_g_pRelocCursor    = NULL;

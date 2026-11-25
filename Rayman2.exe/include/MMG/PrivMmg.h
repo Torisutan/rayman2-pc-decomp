@@ -31,4 +31,7 @@ typedef struct tdstCurrentModeInfo_{
         void *p_vTdstBlockInfoOrTdstDynInfo;
 }tdstCurrentModeInfo;
 
+#define CPA_MALLOC(size)	GlobalAlloc(GMEM_FIXED,size)
+#define CPA_FREE(ptr)		GlobalFree(ptr)
+
 #endif
