@@ -46,6 +46,8 @@ The source holds 3267 C functions (`Rayman2.exe/status.json`): where the linker 
 
 **`WAVMWBVR.dll`** (the sound driver the game loads on any MMX CPU): every one of its 767 C functions has source and the hand-written MMX mixer is reassembled from MASM; **758 are byte-exact** (88% of 42,930 C code bytes) and 9 are not yet (per-function list: `WAVMWBVR.dll/status.json`). The data layout and headers match the original; the DLL builds with the retail toolchain.
 
+**`APMmxBVR.dll`** (the ADPCM sound driver: decodes the `.APM` music and voices for the WAV driver): every one of its 161 C functions has source and the hand-written MMX block is reassembled from MASM; **156 are byte-exact** (90% of 16,634 C code bytes) and 5 are not yet (per-function list: `APMmxBVR.dll/status.json`). The DLL builds with the retail toolchain and plays the game's music.
+
 The full program builds, links and runs. It is not yet byte-identical to retail.
 
 ## How it works
@@ -122,6 +124,24 @@ result over `DLL/WAVMWBVR.dll` (keep a backup) to run the game with it ([BUILDIN
 Several names of uninitialized globals end in a number: the linker orders those globals by the
 compiler's name hash, and the suffix reproduces the original data layout.
 
+## APMmxBVR.dll
+
+Music and voices are `.APM` files (IMA ADPCM). The exe hands them to the ADPCM driver
+`APMmxBVR.dll` (picked from `DLL/SND_CPA.INI` on MMX CPUs), which decodes them and feeds the result to
+the WAV driver as buffer voices. Like the WAV driver it exports `SND_fn_*SxdADPCM` functions and calls
+back into the exe through `GetProcAddress`.
+
+| Source | Contents |
+|---|---|
+| `APMmxBVR.dll/src/SndAdpcm.c` | ADPCM sample layer: up to 30 voices from memory or streamed from disk, themes (transitions with fade), resource loaders |
+| `APMmxBVR.dll/src/pc_sndxdadpcm.c` | The exported `*SxdADPCM` interface |
+| `WAVMWBVR.dll/src/snddll.c` | Shared with the WAV driver (one source, two DLLs; `APMmxBVR.dll/include` holds the differences) |
+| `APMmxBVR.dll/src/mmx/` | The MMX decoder/mixer kernels and the IMA ADPCM tables, hand-written assembly (MASM) |
+| `APMmxBVR.dll/src/APMmxBVR.rc` | Version resource |
+
+`tools/build_apmmx.py` builds it with the retail toolchain (plus ML 6.1x); copy the result over
+`DLL/APMmxBVR.dll` (keep a backup) to run the game with it ([BUILDING.md](BUILDING.md)).
+
 ## Layout
 
 | Path | Contents |
@@ -137,9 +157,11 @@ compiler's name hash, and the suffix reproduces the original data layout.
 | `GliDX6vf.dll/tu.json`, `status.json` | The DLL's link order and flags; each function's retail address, size, source file and verdict |
 | `WAVMWBVR.dll/src/`, `include/` | The sound driver DLL the game loads (`DLL/WAVMWBVR.dll`) |
 | `WAVMWBVR.dll/tu.json`, `status.json` | Its link order, compiler/assembler/linker flags and libraries; each function's retail address, size, source file and verdict |
+| `APMmxBVR.dll/src/`, `include/`, `tu.json`, `status.json` | The ADPCM sound driver DLL (`DLL/APMmxBVR.dll`), the same way |
 | `tools/build.py` | Retail-toolchain build (`--crack` also writes a runnable cracked copy) |
 | `tools/build_glidx6.py` | Retail-toolchain build of `GliDX6vf.dll` (`--check` compares it with your DLL) |
 | `tools/build_wavmw.py` | Retail-toolchain build of `WAVMWBVR.dll` (`--check` compares it with your DLL) |
+| `tools/build_apmmx.py` | Retail-toolchain build of `APMmxBVR.dll` (`--check` compares it with your DLL) |
 | `tools/check.py`, `tools/byte_match.py` | Byte comparison against retail: whole exe, or one function with an asm diff |
 | `tools/crack.py` | Post-link crack step |
 
