@@ -6,4 +6,6 @@
 #define FIL_pc_M_bWriteProfileString(szSection, szKey, szValue, szIniPath) \
     WritePrivateProfileStringA((szSection), (szKey), (szValue), (szIniPath))
 
+#define FIL_pc_M_ulGetTempPath(ulSize, szOut) GetTempPathA((ulSize), (szOut))
+
 #endif
