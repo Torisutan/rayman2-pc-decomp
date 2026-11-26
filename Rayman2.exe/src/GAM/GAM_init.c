@@ -458,14 +458,11 @@ void __cdecl GAM_pc_fn_vReadExternalCtrlCommands(void)
 /* 0x0044f530 */
 static const char GAM_pc_szPleaseInsertCD[] = "Please insert the CD";
 
+extern char *__cdecl FUN_00492770(void);
+extern void __cdecl GLI_FatalExitOrSleep(void);
 void __cdecl GAM_pc_fn_vOpenDsbFile(int lMode, const char *szOpenMode)
 {
-    /* 0x00492770 */
-    extern char *__cdecl FUN_00492770(void);
-
-    /* 0x004011c0 */
-    extern void __cdecl GLI_FatalExitOrSleep(void);
-
+    /* 0x00404da0 */
     char szPath[256];
     char szOrig[256];
     char cMode;
@@ -801,6 +798,7 @@ void __cdecl GAM_pc_fn_vReadExternalCtrlProgressUi(void)
 }
 
 /* 0x00450480 */
+extern void __cdecl GAM_pc_fn_vCloseCdFallbackFile(void);
 void __cdecl GAM_pc_fn_vReadExternalCtrlOpenDataFiles(void)
 {
     char szPath[256];
@@ -814,8 +812,7 @@ void __cdecl GAM_pc_fn_vReadExternalCtrlOpenDataFiles(void)
         {
         case 0x41:
             GAM_pc_fn_vReadExternalCtrlLengthPrefixedBytes(uaName);
-            { extern void __cdecl GAM_pc_fn_vCloseCdFallbackFile(void);  /* 0x0045EDA0 */
-              GAM_pc_fn_vCloseCdFallbackFile(); }
+            GAM_pc_fn_vCloseCdFallbackFile();
             strcpy(szPath, FIL_pc_fn_szGetDataDir());
             strcat(szPath, (char *)uaName);
             GLI_pc_fn_vOpenFileWithCdFallback(szPath);
@@ -1048,6 +1045,7 @@ void __cdecl IPT_pc_fn_vInitInputDevices(short sHistoricSize, HINSTANCE hInstanc
 }
 
 /* 0x004508a0 */
+extern void *__cdecl GAM_pc_fn_hGetAppInstance(void);
 void __cdecl GAM_pc_fn_vProcessExternalCtrlCmds(short nCount)
 {
     while (nCount != 0)
@@ -1067,7 +1065,6 @@ void __cdecl GAM_pc_fn_vProcessExternalCtrlCmds(short nCount)
         case 0x6e: {
 
             /* 0x450913 */
-            extern void *__cdecl GAM_pc_fn_hGetAppInstance(void);
             IPT_pc_fn_vInitInputDevices((short)GAM_pc_fn_ulReadExternalCtrlDword(),
                                         (HINSTANCE)GAM_pc_fn_hGetAppInstance(),
                                         (HWND)GAM_fn_hGetWindowHandle(), 0);
@@ -1079,11 +1076,10 @@ void __cdecl GAM_pc_fn_vProcessExternalCtrlCmds(short nCount)
     }
 }
 
+extern void __cdecl FUN_0045ec20(void);
 void FUN_00403690(void)
 {
-    /* 0x0045ec20 */
-    extern void __cdecl FUN_0045ec20(void);
-
+    /* 0x004508a0 */
     unsigned char ucCond;
 
     if (g_ucGameModuleId == 0xff)
