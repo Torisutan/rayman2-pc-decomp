@@ -187,12 +187,29 @@
 #define SND_C_RES_FANTOME_PTR NULL
 #define SND_C_RES_FANTOME_ID -1
 
+#if !defined(GAMECONSOLE) && !defined(GENERIC)
+
+#define SND_pc_tdhLock					HANDLE
+#define SND_pc_tdhEvent					HANDLE
+#define SND_pc_tdhThread				HANDLE
+#define SND_pc_tdhWaitable				HANDLE
+#define SND_pc_tdstCriticalSection		CRITICAL_SECTION
+#define SND_pc_tdstPerfCounter			LARGE_INTEGER
+#define SND_pc_tdhDevice				HWAVEOUT
+#define SND_pc_tdhWindow				HWND
+#define SND_pc_tdhInstance				HINSTANCE
+#define SND_pc_tdstWaveFormat			WAVEFORMATEX
+#define SND_pc_tdstBufferHeader			WAVEHDR
+#define SND_pc_tdulMessageParam			WPARAM
+#define SND_pc_tdlMessageParam			LPARAM
+#endif
+
 typedef struct _SND_tdstInitStruct
 {
 #if !defined(GAMECONSOLE) && !defined(GENERIC)
-        HINSTANCE hProcessInstance;
-        HWND hMainWindow;
-        HANDLE hMutexDX;
+        SND_pc_tdhInstance hProcessInstance;
+        SND_pc_tdhWindow hMainWindow;
+        SND_pc_tdhLock hMutexDX;
 #else
         int bidon;
 #endif
@@ -208,13 +225,6 @@ typedef struct _SND_tdstInitStruct
 
 #if !defined(GAMECONSOLE) && !defined(GENERIC)
 
-#define SND_pc_tdhLock					HANDLE
-#define SND_pc_tdhEvent					HANDLE
-#define SND_pc_tdhThread				HANDLE
-#define SND_pc_tdstCriticalSection		CRITICAL_SECTION
-#define SND_pc_tdstPerfCounter			LARGE_INTEGER
-#define SND_pc_tdhDevice				HWAVEOUT
-
 #define SND_pc_C_ulWaitForever			INFINITE
 #define SND_pc_C_ulWaitTimedOut			WAIT_TIMEOUT
 
@@ -222,6 +232,11 @@ typedef struct _SND_tdstInitStruct
 #define SND_pc_M_ulWaitLock(hLock,ulMs)			WaitForSingleObject((hLock),(ulMs))
 #define SND_pc_M_bReleaseLock(hLock)			ReleaseMutex(hLock)
 #define SND_pc_M_bDeleteLock(hLock)				CloseHandle(hLock)
+
+#define SND_pc_M_vInitCriticalSection(p_stCs)	InitializeCriticalSection(p_stCs)
+#define SND_pc_M_vDeleteCriticalSection(p_stCs)	DeleteCriticalSection(p_stCs)
+#define SND_pc_M_vEnterCriticalSection(p_stCs)	EnterCriticalSection(p_stCs)
+#define SND_pc_M_vLeaveCriticalSection(p_stCs)	LeaveCriticalSection(p_stCs)
 
 #define SND_pc_M_ulLockOrBreak(hLock)			SND_pc_fn_ulWaitObjectOrBreak((hLock),INFINITE)
 #define SND_pc_M_ulWaitEventOrBreak(hEvent)		SND_pc_fn_ulWaitObjectOrBreak((hEvent),INFINITE)
