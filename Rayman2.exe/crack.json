@@ -1,0 +1,228 @@
+{
+ "semantic": {
+  "0x00448E30": [
+   [
+    198,
+    5,
+    [
+     "abs32",
+     "g_cCDROM"
+    ],
+    46,
+    195
+   ],
+   "run 0x448E5A: after the protection gate the crack stores '.' into g_cCDROM and returns (GOG: mov al,2Eh; mov [g_cCDROM],al; leave; ret). The gate is 0 in the cracked exe, so the entry patch is the same behaviour."
+  ]
+ },
+ "at_offset": {
+  "0x00401D40": [
+   72,
+   14,
+   [
+    72,
+    174
+   ],
+   "run 0x401D83: the crack replaces GetWindowsDirectoryA(buf) + the Windows-dir Ubi.ini copy with buf = \".\" and a jump to the strcat of \"\\\\Ubi.ini\" (+0xAE), so the game reads .\\Ubi.ini. The leading jmp to the VirtualAlloc/VirtualFree resolver stub (0x49B1F0) is not translated: our MMG keeps the original GlobalAlloc/GlobalFree imports."
+  ],
+  "0x00405A30": [
+   16,
+   12,
+   [
+    16,
+    28
+   ],
+   "run in FUN_00405a30 (Ubi.ini loader): the crack replaces `push 0x104; push eax; call [GetWindowsDirectoryA]` by `mov word [eax], '.'` + NOPs, so the loader reads .\\Ubi.ini instead of <windir>\\Ubi.ini."
+  ]
+ },
+ "call_nop": {
+  "0x004022D0": [
+   4201296,
+   "run 0x402532: the crack NOPs WndProc's WM_USER (0x400) dispatch `call GAM_pc_fn_vDispatchWmUser` (the pause / fullscreen re-entry path, which renders from the window thread)."
+  ]
+ },
+ "transplant": {
+  "0x00405930": [
+   4217261,
+   "run 0x40593D in GLI_pc_fn_vReadIniString: the crack replaces `push 0x104; push eax; call [GetWindowsDirectoryA]` by `mov word [eax], '.'` + NOPs, so the GLI ini reads use .\\Ubi.ini instead of <windir>\\Ubi.ini."
+  ],
+  "0x004059B0": [
+   4217380,
+   "run 0x4059BD in GLI_pc_fn_vWriteIniString: same replacement as 0x40593D, so the GLI ini writes go to .\\Ubi.ini instead of <windir>\\Ubi.ini."
+  ],
+  "0x0044DE60": [
+   4515663,
+   "runs 0x44DEB0..0x44E5EC: the crack replaces the LCG-pool trampoline calls (through MMG_pc_g_a_stImport, which stays empty once the resolvers are `ret`) by direct import calls (CreateFileA / ReadFile / FlushInstructionCache / GetCurrentProcess / CloseHandle), and builds the path as \"%s\\%s\" (base dir, LEVELS0.DAT) without the CD drive letter."
+  ],
+  "0x0044E750": [
+   4515692,
+   "run in SNA_pc_fn_bReadFile: the crack replaces the LCG-pool trampoline calls (through MMG_pc_g_a_stImport, which stays empty once the resolvers are `ret`) by direct import calls (ReadFile)."
+  ],
+  "0x0044E8A0": [
+   4516668,
+   "run in SNA_pc_bOpenEmbeddedSna: the crack replaces the LCG-pool trampoline calls (through MMG_pc_g_a_stImport, which stays empty once the resolvers are `ret`) by direct import calls."
+  ],
+  "0x0044EB40": [
+   4518401,
+   "runs in SNA_pc_fn_hOpenFileAtSinusOffset: the crack replaces the LCG-pool trampoline calls (through MMG_pc_g_a_stImport, which stays empty once the resolvers are `ret`) by direct import calls."
+  ],
+  "0x00450A00": [
+   4524662,
+   "runs in SNA_pc_vInitStream: the crack replaces the LCG-pool trampoline calls (through MMG_pc_g_a_stImport, which stays empty once the resolvers are `ret`) by direct import calls."
+  ],
+  "0x00450A80": [
+   4525107,
+   "run in SNA_pc_bOpenFile: the crack replaces the LCG-pool trampoline calls (through MMG_pc_g_a_stImport, which stays empty once the resolvers are `ret`) by direct import calls."
+  ],
+  "0x00450C40": [
+   4525447,
+   "run in SNA_pc_bCloseFile: the crack replaces the LCG-pool trampoline calls (through MMG_pc_g_a_stImport, which stays empty once the resolvers are `ret`) by direct import calls."
+  ],
+  "0x00450EE0": [
+   4526218,
+   "run in SNA_pc_ulSeek: the crack replaces the LCG-pool trampoline calls (through MMG_pc_g_a_stImport, which stays empty once the resolvers are `ret`) by direct import calls."
+  ],
+  "0x00451110": [
+   4526784,
+   "SNA_pc_bRawReadDecodeStubbed: the crack rewrites the whole body (run of 432 bytes from the entry): the crack replaces the LCG-pool trampoline calls (through MMG_pc_g_a_stImport, which stays empty once the resolvers are `ret`) by direct import calls."
+  ],
+  "0x00451300": [
+   4527168,
+   "SNA_pc_bRawReadPlainStubbed: the crack rewrites the whole body (run of 320 bytes from the entry): the crack replaces the LCG-pool trampoline calls (through MMG_pc_g_a_stImport, which stays empty once the resolvers are `ret`) by direct import calls."
+  ],
+  "0x00467130": [
+   4616710,
+   "run 0x46713B in MMG_pc_fn_vFillTamperApiTable: the crack replaces the decoded private-import APIs by its fake CD file system (CRACK_BLOCKS 0x448E6C) and SetErrorMode by the real IAT slot."
+  ],
+  "0x00470000": [
+   4653571,
+   "runs 0x470051 / 0x4700B7 in fn_p_stMiscProtectProcedure (procId 0x170, sum of squared image dwords into a DsgVar): the crack replaces the GetModuleHandle stub by base = 0x517000 (.extra, CRACK_DATA) and skips the stub scrub."
+  ],
+  "0x0047B170": [
+   4698908,
+   "runs 0x47B1C3 / 0x47B229 in fn_p_stComputeXor (0x11B GetMemoryValue reads base + offset): same redirect to .extra as 0x470000."
+  ],
+  "0x0047B340": [
+   4699249,
+   "run 0x47B388 in AI_pc_fn_p_stComputeNotU: the crack jumps over the GetModuleHandle stub and its LCG scrub (LCG progression as GOG; the stub would call the never-resolved private import)."
+  ]
+ },
+ "crack_blocks": {
+  "0x00448E6C": [
+   4493437,
+   "fake CD file APIs written by the crack into the wiped CD check (run 0x448E5A): GetVolumeInformationA, GetDriveTypeA (DRIVE_CDROM), GetDiskFreeSpaceA, Set/GetFileAttributesA, CloseHandle, Set/GetFileTime, CreateFileA / GetFileSize / GetFileInformationByHandle over the .extra2 file table."
+  ]
+ },
+ "crack_data": {
+  "0x00517000": [
+   5976064,
+   ".extra: the crack's RVA-aligned mirror of the original image (headers zero, then .text), read by the AI integrity probes instead of the running image."
+  ],
+  "0x005B3000": [
+   6119424,
+   ".extra2: the crack's virtual CD file table ({size, name length, name} records, -1 last) read by the CRACK_BLOCKS file APIs."
+  ]
+ },
+ "names": {
+  "0x0045FE70": [
+   "msvcrt.dll!sprintf",
+   "sprintf"
+  ],
+  "0x0045FEB0": [
+   "ftol",
+   "msvcrt.dll!_ftol"
+  ],
+  "0x0045FEBC": [
+   "msvcrt.dll!strchr",
+   "strchr"
+  ],
+  "0x0045FF4C": [
+   "floor",
+   "msvcrt.dll!floor"
+  ],
+  "0x0045FF52": [
+   "msvcrt.dll!modf"
+  ],
+  "0x004979D0": [
+   "allmul"
+  ],
+  "0x0049C8F0": [
+   "$T24343"
+  ],
+  "0x0049F3EC": [
+   "GAM_pc_c_szGliLoadErrTitle"
+  ],
+  "0x004A06C0": [
+   "GAM_pc_szPleaseInsertCD",
+   "GLI_CD_szInsertMsg",
+   "SNA_C_szInsertCd_storage"
+  ],
+  "0x004A13D0": [
+   "MMG_pc_g_a_stImport"
+  ],
+  "0x004A2090": [
+   "SNA_pc_a_pszLevelFile"
+  ],
+  "0x004A6AD8": [
+   "g_cCDROM"
+  ],
+  "0x00510BF0": [
+   "MMG_g_ulLCGState",
+   "p_ulLCG"
+  ],
+  "0x00510C04": [
+   "SNA_pc_g_pOpenEmbeddedFrame2"
+  ],
+  "0x00510C2C": [
+   "SNA_pc_g_pCdCheckErrorFrame2"
+  ],
+  "0x00510C30": [
+   "SNA_pc_g_pOpenFileErrorFrame2"
+  ],
+  "0x00510DC4": [
+   "SNA_pc_g_pOpenEmbeddedFrame1"
+  ],
+  "0x00510DEC": [
+   "SNA_pc_g_pCdCheckErrorFrame1"
+  ],
+  "0x00510DF0": [
+   "SNA_pc_g_pOpenFileErrorFrame1"
+  ],
+  "0x00510EA0": [
+   "MMG_pc_g_uLcgPool"
+  ],
+  "0x005113EC": [
+   "SNA_g_lProtectionGate"
+  ],
+  "0x005116F0": [
+   "SNA_pc_g_a_ucLoadKey"
+  ],
+  "0x00511700": [
+   "SNA_pc_g_a_ulTableState"
+  ],
+  "0x00511750": [
+   "SNA_pc_g_ulSelectorModulus"
+  ],
+  "0x00511754": [
+   "SNA_pc_g_lOffsetBase"
+  ],
+  "0x00511760": [
+   "SNA_pc_g_a_ulTableKey"
+  ],
+  "0x005117B0": [
+   "SNA_pc_g_ulUnitNumerator",
+   "i64Ival"
+  ],
+  "0x005117B4": [
+   "SNA_pc_g_ulCountModulus"
+  ],
+  "0x005117BC": [
+   "SNA_pc_g_ulOffsetMul"
+  ],
+  "0x005117C0": [
+   "SNA_pc_g_ulUnitDenominator"
+  ],
+  "0x005117C4": [
+   "SNA_g_ulTableIndex"
+  ]
+ }
+}
