@@ -6,7 +6,7 @@ MD5 `ef4954015d8b67e3534c9dc40ca3ad6e`). The goal is C source that rebuilds a **
 
 ## Status
 
-**`Rayman2.exe`**: the census of the retail code section (0x00401000..0x0049C000, 2026-11-26) finds **3166 functions**. 65 are library code (C runtime, import thunks) that the linker supplies; the other **3101 are game code, and all of them have C source**. **2687 are byte-exact** (86.6%; 60% of the 595,410 bytes of game code) and 414 are not yet.
+**`Rayman2.exe`**: the census of the retail code section (0x00401000..0x0049C000, 2026-11-27) finds **3166 functions**. 65 are library code (C runtime, import thunks) that the linker supplies; the other **3101 are game code, and all of them have C source**. **2687 are byte-exact** (86.6%; 60% of the 595,410 bytes of game code) and 414 are not yet.
 
 The source holds 3267 C functions (`Rayman2.exe/status.json`): where the linker folded identical functions into one retail function, each C function is listed with that address.
 
@@ -42,7 +42,7 @@ The source holds 3267 C functions (`Rayman2.exe/status.json`): where the linker 
 | PIC | 1 | 1 |
 | SPO | 1 | 1 |
 
-**`GliDX6vf.dll`** (the Direct3D 6 renderer the game loads): every one of its 130 functions has C source; **103 are byte-exact** (43% of its 41,153 code bytes), 1 is a recorded floor (the shipped DLL was patched after linking: the C reproduces the linked original) and 26 are not yet byte-exact (per-function list: `GliDX6vf.dll/status.json`). The DLL builds with the retail toolchain and runs the game.
+**`GliDX6vf.dll`** (the Direct3D 6 renderer the game loads): every one of its 130 functions has C source; **102 are byte-exact** (42% of its 41,153 code bytes), 1 is a recorded floor (the shipped DLL was patched after linking: the C reproduces the linked original) and 27 are not yet byte-exact (per-function list: `GliDX6vf.dll/status.json`). The DLL builds with the retail toolchain and runs the game.
 
 **`WAVMWBVR.dll`** (the sound driver the game loads on any MMX CPU): every one of its 767 C functions has source and the hand-written MMX mixer is reassembled from MASM; **758 are byte-exact** (88% of 42,930 C code bytes) and 9 are not yet (per-function list: `WAVMWBVR.dll/status.json`). The data layout and headers match the original; the DLL builds with the retail toolchain.
 
