@@ -3,7 +3,9 @@
 #endif
 #include <stdlib.h>
 #include <string.h>
+#ifdef WIN32
 #include <tlhelp32.h>
+#endif
 
 #include "MMG/MMG_globals.h"
 

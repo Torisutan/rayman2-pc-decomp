@@ -25,7 +25,9 @@ int __cdecl GAM_pc_fn_bAreBothEventsIdle(void);
 __declspec(dllimport) DWORD WINAPI timeGetTime(void);
 #pragma comment(lib, "winmm.lib")
 
+#ifdef WIN32
 #include <io.h>
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

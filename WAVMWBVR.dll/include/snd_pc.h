@@ -43,6 +43,7 @@ typedef struct _SND_pc_tdstVirtualVoiceFunctions {
 	SndBool	(SND_CALL *pfn_bTestIsPlaying)(long voice);
 } SND_pc_tdstVirtualVoiceFunctions;
 
+struct _SND_pc_tdstVirtualVoice;
 long	FUN_10007930(SND_tdhVirtualModule hModule,tduRefRes res,SoundParam *par,long prio,SND_td_pfn_vSoundCallback fn_callback,long par_callback);
 /* 0x10007930 */
 void	FUN_10007ac0(SND_tdhVirtualModule hModule,struct _SND_pc_tdstVirtualVoice *pVoice);

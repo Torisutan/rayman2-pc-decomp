@@ -5,7 +5,9 @@
 #ifdef WIN32
 #include <windows.h>
 #endif
+#ifdef WIN32
 #include <intrin.h>
+#endif
 
 #include "MMG/SNA.h"
 #include "MMG/SNA_pc.h"

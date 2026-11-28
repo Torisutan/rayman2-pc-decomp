@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <string.h>
+#ifdef WIN32
 #include <io.h>
 #include <direct.h>
+#endif
 #include <time.h>
 #include <sys/stat.h>
 #include <stdint.h>
