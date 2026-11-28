@@ -6,14 +6,14 @@ MD5 `ef4954015d8b67e3534c9dc40ca3ad6e`). The goal is C source that rebuilds a **
 
 ## Status
 
-**`Rayman2.exe`**: the census of the retail code section (0x00401000..0x0049C000, 2026-11-28) finds **3166 functions**. 65 are library code (C runtime, import thunks) that the linker supplies; the other **3101 are game code, and all of them have C source**. **2705 are byte-exact** (87.2%; 62% of the 595,507 bytes of game code) and 396 are not yet.
+**`Rayman2.exe`**: the census of the retail code section (0x00401000..0x0049C000, 2026-11-28) finds **3166 functions**. 65 are library code (C runtime, import thunks) that the linker supplies; the other **3101 are game code, and all of them have C source**. **2706 are byte-exact** (87.3%; 62% of the 595,510 bytes of game code) and 395 are not yet.
 
 The source holds 3267 C functions (`Rayman2.exe/status.json`): where the linker folded identical functions into one retail function, each C function is listed with that address.
 
 | Module | Functions | Byte-exact |
 |---|---:|---:|
 | GAM | 776 | 720 |
-| AI | 702 | 670 |
+| AI | 702 | 671 |
 | SND | 417 | 405 |
 | GLI | 326 | 236 |
 | MEC | 117 | 89 |
