@@ -3,6 +3,20 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#define FIL_pc_tdhFind                              HANDLE
+#define FIL_pc_tdstFindData                         WIN32_FIND_DATAA
+#define FIL_pc_C_hInvalidFind                       INVALID_HANDLE_VALUE
+#define FIL_pc_M_hFindFirstFile(szPattern, p_stData) FindFirstFileA((szPattern), (p_stData))
+#define FIL_pc_M_bFindNextFile(hFind, p_stData)     FindNextFileA((hFind), (p_stData))
+#define FIL_pc_M_bFindClose(hFind)                  FindClose(hFind)
+#define FIL_pc_M_bFindIsDirectory(p_stData)         (((p_stData)->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0)
+#define FIL_pc_M_szFindName(p_stData)               ((p_stData)->cFileName)
+#define FIL_pc_M_bCopyFile(szSrc, szDst, bFailIfExists) CopyFileA((szSrc), (szDst), (bFailIfExists))
+#define FIL_pc_M_bDeleteFile(szPath)                DeleteFileA(szPath)
+#define FIL_pc_M_bRemoveDirectory(szPath)           RemoveDirectoryA(szPath)
+#define FIL_pc_M_ulGetCurrentDirectory(ulSize, szOut) GetCurrentDirectoryA((ulSize), (szOut))
+#define FIL_pc_M_bSetCurrentDirectory(szPath)       SetCurrentDirectoryA(szPath)
+
 typedef struct FIL_tdstFileHeader_ {
     unsigned long  ulWidth;
     unsigned long  ulHeight;

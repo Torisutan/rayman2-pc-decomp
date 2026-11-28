@@ -384,9 +384,9 @@ long __cdecl fn_lGetNbAvailableSlots(void)
     char szCwd[0x100];
     long lNbSlots;
 
-    GetCurrentDirectoryA(0x100, szCwd);
+    FIL_pc_M_ulGetCurrentDirectory(0x100, szCwd);
     lNbSlots = GAM_pc_fn_lCountSaveSlotDirs(FUN_00492700());
-    SetCurrentDirectoryA(szCwd);
+    FIL_pc_M_bSetCurrentDirectory(szCwd);
     GAM_pc_fn_ucGrowSaveSlotList(lNbSlots);
     return lNbSlots;
 }
@@ -510,8 +510,8 @@ int __cdecl GAM_pc_fn_bCopyDirectoryTree(char *pszSrc, char *pszDst)
 {
     char             szSrc[256];
     char             szDst[256];
-    WIN32_FIND_DATAA stFind;
-    HANDLE           hFind;
+    FIL_pc_tdstFindData stFind;
+    FIL_pc_tdhFind      hFind;
     size_t           ulSrcLen;
     size_t           ulDstLen;
     unsigned long    ulSuffix;
@@ -524,22 +524,22 @@ int __cdecl GAM_pc_fn_bCopyDirectoryTree(char *pszSrc, char *pszDst)
     *(unsigned long *)&szSrc[ulSrcLen] = ulSuffix;
     szSrc[ulSrcLen + 4] = GAM_g_cAllFilesSuffixNul;
 
-    hFind = FindFirstFileA(szSrc, &stFind);
-    if (hFind == INVALID_HANDLE_VALUE)
+    hFind = FIL_pc_M_hFindFirstFile(szSrc, &stFind);
+    if (hFind == FIL_pc_C_hInvalidFind)
         return 0;
     do {
         szSrc[ulSrcLen] = '\\';
         szDst[ulDstLen] = '\\';
-        if ((stFind.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0) {
-            strcpy(&szSrc[ulSrcLen + 1], stFind.cFileName);
-            strcpy(&szDst[ulDstLen + 1], stFind.cFileName);
-            if (!CopyFileA(szSrc, szDst, FALSE))
+        if (!FIL_pc_M_bFindIsDirectory(&stFind)) {
+            strcpy(&szSrc[ulSrcLen + 1], FIL_pc_M_szFindName(&stFind));
+            strcpy(&szDst[ulDstLen + 1], FIL_pc_M_szFindName(&stFind));
+            if (!FIL_pc_M_bCopyFile(szSrc, szDst, FALSE))
                 return 0;
         }
         szDst[ulDstLen] = '\0';
         szSrc[ulSrcLen] = '\0';
-    } while (FindNextFileA(hFind, &stFind));
-    FindClose(hFind);
+    } while (FIL_pc_M_bFindNextFile(hFind, &stFind));
+    FIL_pc_M_bFindClose(hFind);
     return 1;
 }
 
@@ -547,8 +547,8 @@ int __cdecl GAM_pc_fn_bCopyDirectoryTree(char *pszSrc, char *pszDst)
 int __cdecl GAM_pc_fn_bDeleteDirectoryTree(char *pszDir)
 {
     char             szPattern[256];
-    WIN32_FIND_DATAA stFind;
-    HANDLE           hFind;
+    FIL_pc_tdstFindData stFind;
+    FIL_pc_tdhFind      hFind;
     size_t           ulLen;
     char            *pSuffix;
 
@@ -561,24 +561,24 @@ int __cdecl GAM_pc_fn_bDeleteDirectoryTree(char *pszDir)
     *(unsigned long *)pSuffix = GAM_g_ulAllFilesSuffix;
     pSuffix[4] = GAM_g_cAllFilesSuffixNul;
 
-    hFind = FindFirstFileA(szPattern, &stFind);
-    if (hFind != INVALID_HANDLE_VALUE) {
+    hFind = FIL_pc_M_hFindFirstFile(szPattern, &stFind);
+    if (hFind != FIL_pc_C_hInvalidFind) {
         do {
-            if ((stFind.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0) {
+            if (!FIL_pc_M_bFindIsDirectory(&stFind)) {
 
-                strcpy(pSuffix + 1, stFind.cFileName);
-                if (!DeleteFileA(szPattern))
+                strcpy(pSuffix + 1, FIL_pc_M_szFindName(&stFind));
+                if (!FIL_pc_M_bDeleteFile(szPattern))
                     return 0;
-            } else if (strcmp(stFind.cFileName, ".") != 0 &&
-                       strcmp(stFind.cFileName, "..") != 0) {
+            } else if (strcmp(FIL_pc_M_szFindName(&stFind), ".") != 0 &&
+                       strcmp(FIL_pc_M_szFindName(&stFind), "..") != 0) {
 
-                strcpy(pSuffix + 1, stFind.cFileName);
+                strcpy(pSuffix + 1, FIL_pc_M_szFindName(&stFind));
                 if (!GAM_pc_fn_bDeleteDirectoryTree(szPattern))
                     return 0;
-                RemoveDirectoryA(szPattern);
+                FIL_pc_M_bRemoveDirectory(szPattern);
             }
-        } while (FindNextFileA(hFind, &stFind));
-        FindClose(hFind);
+        } while (FIL_pc_M_bFindNextFile(hFind, &stFind));
+        FIL_pc_M_bFindClose(hFind);
     }
     return 1;
 }

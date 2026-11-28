@@ -37,7 +37,7 @@ unsigned char __cdecl SAI_fn_ucSaveAllGameTableValues(
     char                     szTmpPath[260];
 
     sprintf(szTmpPath, "%s/TT.tmp", FUN_004928c0());
-    DeleteFileA(szTmpPath);
+    FIL_pc_M_bDeleteFile(szTmpPath);
     FIL_fn_bValidatePath(".", _p_cFileName);
 
     p_File = fopen(szTmpPath, "wb");
@@ -55,7 +55,7 @@ unsigned char __cdecl SAI_fn_ucSaveAllGameTableValues(
     }
     else
         bReturn = SAI_FALSE;
-    DeleteFileA(szTmpPath);
+    FIL_pc_M_bDeleteFile(szTmpPath);
     return bReturn;
 }
 
@@ -202,7 +202,7 @@ unsigned char __cdecl SAI_fn_ucLoadAllGameTableValues(
     char                     szTmpPath[260];
 
     sprintf(szTmpPath, "%s/TT.tmp", FUN_004928c0());
-    DeleteFileA(szTmpPath);
+    FIL_pc_M_bDeleteFile(szTmpPath);
 
     if (FUN_0048d370(_p_cFileName, szTmpPath, 2) &&
         (p_File = fopen(szTmpPath, "rb")) != NULL)
@@ -216,7 +216,7 @@ unsigned char __cdecl SAI_fn_ucLoadAllGameTableValues(
         fclose(p_File);
         bReturn = SAI_TRUE;
     }
-    DeleteFileA(szTmpPath);
+    FIL_pc_M_bDeleteFile(szTmpPath);
     return bReturn;
 }
 

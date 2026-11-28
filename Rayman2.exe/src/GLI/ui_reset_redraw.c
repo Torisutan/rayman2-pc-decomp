@@ -7,6 +7,7 @@
 #include "GLI/Texture.h"
 #include "FIL/File.h"
 #include "ERM/CpaError.h"
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
