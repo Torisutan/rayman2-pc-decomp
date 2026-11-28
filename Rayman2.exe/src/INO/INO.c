@@ -1,7 +1,11 @@
 #include "INO/INO.h"
 #include "GLI/Memory.h"
 #include "INO/INO_globals.h"
+#ifdef USE_SDL
+#include "INO/sdl_ino.h"
+#else
 #include "INO/dinput_dx6.h"
+#endif
 
 /* 0x00509DE0 */
 INO_tdhDevice INO_pc_a_hDevices_storage[INO_C_wNbMaxDevice];
@@ -30,6 +34,7 @@ extern const struct _GUID IID_IDirectInputDevice2A;
 HWND      INO_pc_g_hWnd;
 HINSTANCE INO_pc_g_hInstance;
 
+#ifndef USE_SDL
 typedef struct INO_pc_tdstDeviceSlot_ {
     DIDEVICEINSTANCEA   stInstance;
     void               *p_vDevice;
@@ -48,6 +53,7 @@ static INO_pc_tdstDeviceSlot INO_pc_g_aSlotTable[INO_C_wNbMaxDevice];   /* 0x005
 #define INO_pc_SLOT_DIDEV_B(i)    (INO_pc_g_aSlotTable[i].p_vDevice2)
 #define INO_pc_SLOT_SELECTOR(i)   (INO_pc_g_aSlotTable[i].wUseDevice2)
 #define INO_pc_SLOT_RECORD(i)     (INO_pc_g_aSlotTable[i].p_stDevice)
+#endif
 
 short __cdecl INO_pc_wRefreshDeviceCaps(INO_tdstDevice *pDevice);   /* 0x004957C0 */
 short __cdecl INO_pc_ReadMouse(INO_tdstDevice *pDevice);
