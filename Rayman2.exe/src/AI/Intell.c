@@ -92,8 +92,6 @@ extern AI_tdstTypeTable      a_stTypeTable[];        /* 0x004A4180 */
 
 #define M_TestActionReturn(ActionReturn, Flag)  (((ActionReturn) & (Flag)) == (Flag))
 
-#define E_ti_EndTree               8
-
 void __cdecl fn_vSetProcedureActionReturn(unsigned char ucActionReturn);
 #define AI_pfn_fn_vSetProcedureActionReturn  fn_vSetProcedureActionReturn
 
@@ -621,7 +619,7 @@ AI_tdstNodeInterpret *__cdecl fn_p_stSkipThisArgument(AI_tdstNodeInterpret *p_st
 
     p_stTree++;
 
-    while (p_stTree->ucDepth > ucDepth && p_stTree->eType != E_ti_EndTree)
+    while ( (M_DepthInterpret(p_stTree) > ucDepth) && (!M_IsTheEndOfTree(p_stTree)))
         p_stTree++;
 
     return p_stTree;
@@ -749,7 +747,7 @@ ComputeActionReturn:
     else
     {
 
-        if (p_stTree->eType == E_ti_EndTree)
+        if (M_IsTheEndOfTree(p_stTree))
             ucActionReturn = C_TREE_FINISHED;
         else if (!M_TestActionReturn(ucActionReturn, C_ACTION_ENGINE_STOP_RULE))
         {
@@ -885,7 +883,7 @@ unsigned char __cdecl fn_ucIntelligenceScheduleEngine(HIE_tdstSuperObject *p_Sup
     if (ucIndTabAction < AI_M_ActionTableNbEntries(p_stIntelligence))
         p_stTree = fn_p_stGetTableAction(p_stIntelligence, ucIndTabAction);
 
-    if (M_GetTypeInterpret(p_stTree) == E_ti_EndTree)
+    if (M_IsTheEndOfTree(p_stTree))
         p_stTree = AI_M_GetTreeComportSchedule((AI_tdstComport *)AI_M_GetCurrentComport(p_stIntelligence));
 
     p_stTree = fn_p_stIntelligenceEvalTreeEngine(p_SuperObjPerso, p_stTree, &stValue);

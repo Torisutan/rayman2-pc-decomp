@@ -1,4 +1,5 @@
 #include "AI/AI_types.h"
+#include "AI/EnumType.h"
 #include "GAM/GAM_types.h"
 #include "AI/Brain.h"
 #include "AI/DsgMem.h"
@@ -97,15 +98,12 @@ HIE_tdstSuperObject *g_hCurrentSuperObjPerso;
 #include "MTH/MTH_flt.h"
 #include "MTH/MTH3D.h"
 
-typedef int tdeTypeInterpret;
 typedef unsigned long tdeOperatorId;
 typedef long tdeFieldId;
 #define M_TypeUnionInterpret(p_Tree)    (&((p_Tree)->uId))
 #define M_eOperatorIdInterpret(p_Tree)  (*M_TypeUnionInterpret(p_Tree))
 #define M_eFieldIdInterpret(p_Tree)     (*M_TypeUnionInterpret(p_Tree))
 
-#define E_ti_Field                 9
-#define E_ti_DsgVarRef             11
 #define eNbField                   0x12
 #define eOperator_PlusAffect       5
 #define eOperator_MinusAffect      6

@@ -1,6 +1,8 @@
 #ifndef AI_STRINTEL_H
 #define AI_STRINTEL_H
 
+#include "AI/EnumType.h"
+
 #define M_DepthInterpret(p_Tree)           ((p_Tree)->ucDepth)
 
 #define M_NodeToSkip(p_Tree)               ((p_Tree)->uwNodeToSkip)
@@ -38,6 +40,8 @@
 #define M_ObjectTableInterpret(p_Tree)			(M_GetSetParam_hObjectTable(p_Tree))
 #define M_ColorValueInterpret(p_Tree)			(M_GetSetParam_ColorValue(p_Tree))
 #define M_p_stModelInterpret(p_Tree)			(M_GetSetParam_p_stModel(p_Tree))
+
+#define M_IsTheEndOfTree(p_Tree)           (M_GetTypeInterpret(p_Tree) == E_ti_EndTree)
 #define M_p_stLightInterpret(p_Tree)				(M_GetSetParam_LightValue(p_Tree))
 #define M_ulCapsInterpret(p_Tree)				(M_GetSetParam_CapsValue(p_Tree))
 #define M_p_stGraphInterpret(p_Tree)			(M_GetSetParam_GraphValue(p_Tree))

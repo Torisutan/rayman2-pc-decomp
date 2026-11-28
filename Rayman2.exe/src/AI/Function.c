@@ -1660,6 +1660,7 @@ AI_tdstNodeInterpret *__cdecl fn_p_stVectorFunction(HIE_tdstSuperObject *p_Super
 
 #include "AI/DsgMem.h"
 #include "AI/Brain.h"
+#include "AI/EnumType.h"
 
 #define AI_PRO_M_vCallModuleStub(ulModule)                                                     \
     {                                                                                          \

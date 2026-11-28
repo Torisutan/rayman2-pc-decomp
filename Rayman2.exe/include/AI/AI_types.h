@@ -1408,7 +1408,6 @@ void __cdecl fn_vComputeCollideResult(HIE_tdstSuperObject *hSender);
     M_EvalNextParameter(&stParam1); \
     M_EvalNextParameter(&stParam2);
 
-#define E_ti_Operator 2
 #define E_uwAIFatalNotValidFunction ((unsigned short)0x27)
 
 #define M_RealToIntSnd(r) ((r)>>16)

@@ -9,11 +9,6 @@
 #include "AI/WP_Handl.h"
 #include "FON/FON_types.h"
 
-#define E_ti_KeyWord   0
-#define E_ti_EndTree   8
-
-#define M_IsTheEndOfTree(p_Tree)           (M_GetTypeInterpret(p_Tree) == E_ti_EndTree)
-
 #define AI_M_pc_GetEngineObject(p_stSuperObject) \
     ((HIE_M_xGetSuperObjectMember(p_stSuperObject, ulTypeOfLinkedObject) != HIE_C_ulActor) ? NULL \
      : ((struct tdstEngineObject_ *)HIE_M_xGetSuperObjectMember(p_stSuperObject, hLinkedObject.p_Void)))

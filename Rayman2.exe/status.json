@@ -17034,7 +17034,7 @@
 "addr": "0x0046E450",
 "name": "fn_p_stReadAnalogJoystickMario",
 "src": "src/AI/Procedur.c",
-"len": 4877,
+"len": 4879,
 "verdict": "MISMATCH"
 },
 {
@@ -17132,7 +17132,7 @@
 "addr": "0x00470000",
 "name": "fn_p_stMiscProtectProcedure",
 "src": "src/AI/Procedur.c",
-"len": 563,
+"len": 565,
 "verdict": "MISMATCH"
 },
 {
@@ -19492,7 +19492,7 @@
 "name": "fn_p_stScalarOperator",
 "src": "src/AI/Operator.c",
 "len": 472,
-"verdict": "MISMATCH"
+"verdict": "EXACT"
 },
 {
 "addr": "0x00481A60",

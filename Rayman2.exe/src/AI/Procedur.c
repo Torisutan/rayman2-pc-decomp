@@ -1,4 +1,5 @@
 #include "AI/AI_types.h"
+#include "AI/EnumType.h"
 #include "AI/Brain.h"
 #include "GMT/GMT_types.h"
 #include "GAM/Actions/CollSet.h"
@@ -186,8 +187,6 @@ extern AI_tdstProcedureEntry a_stProcedureTable[];   /* 0x004A43E0 */
 #define AI_M_ucGetProcedureUltra(procId)   (a_stProcedureTable[procId].bUltraProcedureFlag)
 
 #define AI_g_p_stUltraOperatorPerso  g_hCurrentSuperObjPerso
-
-#define AI_MGT_hMagnet(perso)  M_GetMSHandle((perso), MSMagnet)
 
 #define AI_MAGNET_ON           1
 #define AI_MAGNET_GROWING      2
@@ -386,8 +385,6 @@ extern unsigned char __cdecl IPT_fn_bChangeIPTValue(struct IPT_tdstEntryElement_
 #define AI_M_pfn_IPT_fn_bChangeIPTValue     ((char (__cdecl *)(void *, long))IPT_fn_bChangeIPTValue)
 #define AI_M_pfn_IPT_fn_bModifyIPTAction    ((char (__cdecl *)(void *, void *))IPT_fn_bModifyIPTAction)
 #define AI_IPT_C_Exchange                   1L
-
-#define AI_M_pfn_CAM_fn_hCineInfoGetSuperObjectTargeted ((void *(__cdecl *)(void *))CAM_fn_hCineInfoGetSuperObjectTargeted)
 
 #define AI_M_g_h_StdCamCaracter    (GAM_g_stEngineStructure.h_StdCamCaracter)
 #define AI_C_ucNbOfCheckedSpeeds   8
@@ -797,98 +794,6 @@ extern int   IPT_g_FieldPadSector;                      /* 0x004B9B84 */
 #define MTH_M_xDoubleToReal             MTH_M_xDoubleToFloat
 #endif
 
-#define AI_CAM_hCineInfo(camera)   M_GetMSHandle((camera), Cineinfo)
-#define AI_CAM_hInit(hCine)        (((struct tdstCineinfo_ *)(hCine))->hInit)
-#define AI_CAM_hCurrent(hCine)     (((struct tdstCineinfo_ *)(hCine))->hCurrent)
-#define AI_CAM_hVisibility(hCine)  (((struct tdstCineinfo_ *)(hCine))->hVisibility)
-#define AI_CAM_hWork(hCine)        (((struct tdstCineinfo_ *)(hCine))->hWork)
-#define AI_CAM_uwIAFlags(internal)  (((struct tdstInternalStructurCineinfo_ *)(internal))->uwIAFlags)
-#define AI_CAM_uwDNMFlags(internal) (((struct tdstInternalStructurCineinfo_ *)(internal))->uwDNMFlags)
-#define AI_CAM_cChannel(internal)   (((struct tdstInternalStructurCineinfo_ *)(internal))->cChannel)
-#define AI_CAM_hSuperObjectTargeted(internal) (((struct tdstInternalStructurCineinfo_ *)(internal))->hSuperObjectTargeted)
-#define AI_CAM_hSecondSuperObjectTargeted(internal) (((struct tdstInternalStructurCineinfo_ *)(internal))->hSecondSuperObjectTargeted)
-/* 0x004B9C14 */
-extern void *CAM_g_hOldTargetedPerso;
-#define AI_CAM_g_hOldTargetedPerso  (CAM_g_hOldTargetedPerso)
-/* 0x0049CCF8 */
-static const unsigned long AI_CAM_x0_001_bits = 0x3A83126Fu;
-#define AI_CAM_x0_001  (*(const float *)&AI_CAM_x0_001_bits)
-
-#define AI_CAM_ucVolIAFlags(hCine)  (((struct tdstCineinfo_ *)(hCine))->ucVolIAFlags)
-#define AI_CAM_ucPerIAFlags(hCine)  (((struct tdstCineinfo_ *)(hCine))->ucPerIAFlags)
-#define AI_CAM_xApexRatio(hCine)    (((struct tdstCineinfo_ *)(hCine))->xApexRatio)
-#define AI_CAM_C_VolIAFlags_CurrentAlreadyCopiedInWork  1
-#define AI_CAM_C_PerIAFlags_VisibilityCopied            2
-
-#define AI_CAM_eTypeOfViewport(internal) (((struct tdstInternalStructurCineinfo_ *)(internal))->eTypeOfViewport)
-
-#define AI_CAM_g_hStdCamCaracter    AI_M_g_h_StdCamCaracter   /* 0x500580 */
-
-#define AI_CAM_bCanDoBestPos(hCine) (((struct tdstCineinfo_ *)(hCine))->bCanDoBestPos)
-
-#define AI_M_pfn_CAM_fn_vSetResetInternalFlag CAM_fn_vSetResetInternalFlag
-
-/* 0x0047DC70 */
-extern void __cdecl CAM_fn_vActivateCamera(void *_hCineInfo, long _lTypeOfChange, ACP_tdxBool _bActive);
-#define AI_M_pfn_CAM_fn_vActivateCamera CAM_fn_vActivateCamera
-
-#define AI_M_pfn_CAM_fn_vSetCineinfoWorkFromCurrent \
-    ((void (__cdecl *)(void *))CAM_fn_vSetCineinfoWorkFromCurrent)
-
-#define AI_M_pfn_CAM_fn_vUpdateTargetPosition ((void (__cdecl *)(void *))CAM_fn_vUpdateTargetPosition)
-
-/* 0x00414100 */
-extern void __cdecl CAM_fn_vSetCineinfoCurrentFromVisibility(struct tdstCineinfo_ *hCineinfo);
-extern void __cdecl CAM_fn_vSetCineinfoWorkFromVisibility(struct tdstCineinfo_ *hCineinfo);
-#define AI_M_pfn_CAM_fn_vSetCineinfoCurrentFromVisibility CAM_fn_vSetCineinfoCurrentFromVisibility
-#define AI_M_pfn_CAM_fn_vSetCineinfoWorkFromVisibility    CAM_fn_vSetCineinfoWorkFromVisibility
-
-#define AI_M_pfn_CAM_fn_hGetActiveCamera         ((HIE_tdstSuperObject *(__cdecl *)(long))&CAM_fn_hGetActiveCamera)
-/* 0x40B840 */
-extern void __cdecl CAM_fn_vAssignCameraToAViewport(long _lViewportNumber, void *_hCamera);
-#define AI_M_pfn_CAM_fn_vAssignCameraToAViewport CAM_fn_vAssignCameraToAViewport
-
-extern void __cdecl GAM_fn_vChangeCharacterForMicro(void *_hCharacter);
-#define AI_M_pfn_GAM_fn_vChangeCharacterForMicro GAM_fn_vChangeCharacterForMicro
-
-/* 0x0047DBE0 */
-extern void __cdecl CAM_fn_vChangeARealParameter(void *_hCineInfo, float *_p_xInitialValue, float *_p_xCurrentValue, float *_p_xVisibilityValue, float *_p_xWorkValue, long _lTypeOfChange, long _lChangingMode, float _xValue);
-#define AI_M_pfn_CAM_fn_vChangeARealParameter CAM_fn_vChangeARealParameter
-
-/* 0x0047DCE0 */
-extern void __cdecl CAM_fn_vChangeAVectorParameter(void *_hCineInfo, MTH3D_tdstVector *_p_stInitialValue, MTH3D_tdstVector *_p_stCurrentValue, MTH3D_tdstVector *_p_stVisibilityValue, MTH3D_tdstVector *_p_stWorkValue, long _lTypeOfChange, long _lChangingMode, MTH3D_tdstVector *_p_stValue);
-
-#define AI_M_pfn_CAM_fn_vInitCompleteCineinfo ((void (__cdecl *)(void *))CAM_fn_vInitCompleteCineinfo)
-
-/* 0x00474270 */
-extern void __cdecl CAM_fn_vInitCameraStructure(struct HIE_tdstSuperObject *_hSuperObjPerso, struct CAM_tdstUpdateCamera_ *_p_stStruct);
-#define AI_M_pfn_CAM_fn_vInitCameraStructure        ((void (__cdecl *)(void *, void *))CAM_fn_vInitCameraStructure)
-#define AI_M_pfn_CAM_fn_vComputeReferencePoint(p_stStruct) CAM_fn_vComputeReferencePoint((struct CAM_tdstUpdateCamera_ *)(p_stStruct))
-#define AI_M_pfn_CAM_fn_vComputeTarget(p_stStruct)         CAM_fn_vComputeTarget((struct CAM_tdstUpdateCamera_ *)(p_stStruct))
-/* 0x00484540 */
-void CAM_fn_vComputeRealWantedPos(void *_p_stStruct);
-#define AI_M_pfn_CAM_fn_vComputeRealWantedPos(p_stStruct) CAM_fn_vComputeRealWantedPos((void *)(p_stStruct))
-extern void __cdecl CAM_fn_vComputeMovePosWithDynTheta(struct CAM_tdstUpdateCamera_ *_p_stStruct);
-#define AI_M_pfn_CAM_fn_vComputeMovePosWithDynTheta ((void (__cdecl *)(void *))CAM_fn_vComputeMovePosWithDynTheta)
-extern void __cdecl CAM_fn_vForceFailureVisibility(struct CAM_tdstUpdateCamera_ *_p_stStruct);
-extern void __cdecl CAM_fn_vComputeFailureVisibility(struct CAM_tdstUpdateCamera_ *_p_stStruct);
-#define AI_M_pfn_CAM_fn_vForceFailureVisibility     ((void (__cdecl *)(void *))CAM_fn_vForceFailureVisibility)   /* 0x00486EA0 */
-#define AI_M_pfn_CAM_fn_vComputeFailureVisibility   ((void (__cdecl *)(void *))CAM_fn_vComputeFailureVisibility)   /* 0x00486F40 */
-
-extern char cRefAxisIsAlreadyComputed;   /* 0x4E92FD */
-extern char cNoDynChangeTheta;           /* 0x4E92FC */
-#define AI_CAM_cRefAxisIsAlreadyComputed (cRefAxisIsAlreadyComputed)
-#define AI_CAM_cNoDynChangeTheta         (cNoDynChangeTheta)
-#define AI_CAM_cCanTestStatic            (*(unsigned char *)AI_CAM_gp_cCanTestStatic)
-
-#define AI_CAM_struct_hWork(s)    (((CAM_tdstUpdateCamera *)(s))->hCineinfoWork)
-#define AI_CAM_struct_hCurrent(s) (((CAM_tdstUpdateCamera *)(s))->hCineinfoCurrent)
-
-#define AI_CAM_eState(cineinfo)  (((struct tdstCineinfo_ *)(cineinfo))->eState)
-#define AI_CAM_C_PerIAFlags_ConstraintMoveVisFailure  0x08
-
-#define AI_CAM_C_PerIAFlags_ShowInfo  0x01
-
 #define AI_PAD_hAnalogAxisX  (AI_PAD_hAnalogAxisX_storage)
 #define AI_PAD_hAnalogAxisY  (AI_PAD_hAnalogAxisY_storage)
 #define AI_PAD_cAnalogValueX (AI_PAD_cAnalogValueX_storage)
@@ -925,18 +830,6 @@ extern unsigned char __cdecl fn_ucInternalTurn(HIE_tdstSuperObject *p_SuperObjPe
 #define AI_C_xMilli      AI_x0_001      /* 0x0049CBF4 */
 
 #define AI_g_ulUsefulDeltaTime  (*(unsigned long *)(GAM_ENGINE_BASE + 0xB4))
-
-/* 0x00433210 */
-extern void __cdecl MEC_fn_vUpdateSpeed(HIE_tdstSuperObject *hSupObj);
-#define AI_M_pfn_MEC_fn_vUpdateSpeed             ((void (__cdecl *)(void *))&MEC_fn_vUpdateSpeed)
-#define AI_M_pfn_fn_p_stDynamGetDynamics         ((void *(__cdecl *)(void *))&fn_p_stDynamGetDynamics)
-#define AI_M_pfn_CAM_fn_vRemindSpeed             ((void (__cdecl *)(void *, void *))CAM_fn_vRemindSpeed)
-#define AI_M_pfn_CAM_fn_vRemindPos               ((void (__cdecl *)(void *, void *))CAM_fn_vRemindPos)
-#define AI_M_pfn_CAM_fn_vRemindTime              ((void (__cdecl *)(void *, float))CAM_fn_vRemindTime)
-extern void __cdecl CAM_fn_vUpdateGeneralCamera(struct CAM_tdstUpdateCamera_ *_p_stStruct);
-#define AI_M_pfn_CAM_fn_vUpdateGeneralCamera     ((void (__cdecl *)(void *))CAM_fn_vUpdateGeneralCamera)
-/* 0x00474420 */
-extern void __cdecl CAM_fn_vSendParametersToParsing(void *_p_stStruct);
 
 /* 0x004675A0 */
 AI_tdstNodeInterpret *__cdecl fn_p_stMiscUltraProcedure(
@@ -5975,7 +5868,6 @@ AI_tdstNodeInterpret *__cdecl fn_p_stSaveCurrentSoundRequest(
     }
     return p_stNext;
 }
-#define AI_M_pfn_CAM_fn_vSendParametersToParsing ((void (__cdecl *)(void *))CAM_fn_vSendParametersToParsing)
 
 #include "GAM/STRUCTUR/Engmode.h"
 

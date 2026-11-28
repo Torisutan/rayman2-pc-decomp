@@ -14,6 +14,7 @@
 #include "HIE/HIE_types.h"
 #include "HIE/HieSpObj.h"
 #include "AI/AI_types.h"
+#include "AI/EnumType.h"
 #include "AI/Brain.h"
 #include "FON/fontext.h"
 #include "GLI/Brightness.h"

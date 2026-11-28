@@ -6,8 +6,6 @@
 #include "ERM/CpaError.h"
 #include "MMG/MMG_globals.h"
 
-#define M_IsTheEndOfTree(p_Tree)   ((p_Tree)->eType == 8)
-
 /* 0x00480950 */
 AI_tdstNodeInterpret *__cdecl fn_p_stSwapNextParameter(AI_tdstNodeInterpret *p_stTree)
 {

@@ -1,4 +1,5 @@
 #include "AI/AI_types.h"
+#include "AI/EnumType.h"
 #include "AI/AI_globals.h"
 #include "GAM/GAM_types.h"
 #include "GAM/cineinfo.h"
