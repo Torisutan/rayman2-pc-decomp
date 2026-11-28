@@ -7,7 +7,7 @@
 
 unsigned long __cdecl fn_ulTimerEventTickPerSecond(short channel);
 
-void          __cdecl fn_vTimerGetCounter(short channel, LARGE_INTEGER *p);
+void          __cdecl fn_vTimerGetCounter(short channel, void *p_vTarget);
 unsigned long __cdecl TMR_pc_fn_bHasCPUID(void);
 unsigned long __cdecl TMR_pc_fn_ulGetCPUSignature(void);
 unsigned long __cdecl TMR_pc_fn_ulReadCpuVendorString(void);  /* 0x45e9e0 */

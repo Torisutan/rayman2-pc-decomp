@@ -6,7 +6,7 @@
 
 typedef int _tmr_size_check[(sizeof(TMR_tdstTimer) == 0x24) ? 1 : -1];
 
-typedef void  (__cdecl *tFUN_0045E930)(short wType, LARGE_INTEGER *out);
+typedef void  (__cdecl *tFUN_0045E930)(short wType, void *out);
 
 #include "GLI/cpu_timer.h"
 
@@ -112,7 +112,7 @@ short __stdcall TMR_fn_wStartTimer( short wTimerHandle )
     }
 
     wTimerType = a_stTimerTab[wTimerHandle].m_wTimerType;
-    fn_vTimerGetCounter(wTimerType,(LARGE_INTEGER *)&stValue);
+    fn_vTimerGetCounter(wTimerType,&stValue);
 
     a_stTimerTab[wTimerHandle].m_stTimerCount_InitValue.m_ulLowPart = stValue.m_ulLowPart;
     a_stTimerTab[wTimerHandle].m_stTimerCount_InitValue.m_ulHighPart = stValue.m_ulHighPart;
@@ -159,7 +159,7 @@ short __stdcall TMR_fn_wStopTimer( short wTimerHandle )
 
     if ( a_stTimerTab[wTimerHandle].m_wTimerState == C_wTimerRunning )
     {
-        fn_vTimerGetCounter(wTimerType,(LARGE_INTEGER *)&stValue);
+        fn_vTimerGetCounter(wTimerType,&stValue);
         a_stTimerTab[wTimerHandle].m_stTimerCount_LastValue.m_ulLowPart = stValue.m_ulLowPart;
         a_stTimerTab[wTimerHandle].m_stTimerCount_LastValue.m_ulHighPart = stValue.m_ulHighPart;
     }
@@ -246,7 +246,7 @@ short __stdcall TMR_fn_wReadTimer( short wTimerHandle, stTimerCount *p_stTimerCo
     {
 
     case C_wTimerRunning:
-        fn_vTimerGetCounter(a_stTimerTab[wTimerHandle].m_wTimerType,(LARGE_INTEGER *)p_stTimerCount);
+        fn_vTimerGetCounter(a_stTimerTab[wTimerHandle].m_wTimerType,p_stTimerCount);
         stValue.m_ulLowPart = a_stTimerTab[wTimerHandle].m_stTimerCount_InitValue.m_ulLowPart;
         stValue.m_ulHighPart = a_stTimerTab[wTimerHandle].m_stTimerCount_InitValue.m_ulHighPart;
         fn_vSubTimerValues((unsigned int *)p_stTimerCount,(unsigned int *)&stValue);

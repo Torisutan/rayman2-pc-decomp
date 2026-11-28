@@ -81,19 +81,19 @@ unsigned long __cdecl fn_ulTimerEventTickPerSecond(short channel)
     return ulFreq;
 }
 
-void __cdecl fn_vTimerGetCounter(short channel, LARGE_INTEGER *p_stOut)
+void __cdecl fn_vTimerGetCounter(short channel, void *p_vTarget)
 {
 
     switch (channel) {
     case 0:
-        p_stOut->u.LowPart  = (DWORD)timeGetTime();
-        p_stOut->u.HighPart = 0;
+        ((LARGE_INTEGER *)p_vTarget)->u.LowPart  = (DWORD)timeGetTime();
+        ((LARGE_INTEGER *)p_vTarget)->u.HighPart = 0;
         break;
     case 1:
-        QueryPerformanceCounter(p_stOut);
+        QueryPerformanceCounter((LARGE_INTEGER *)p_vTarget);
         break;
     case 2:
-        TMR_pc_fn_vReadTSC((unsigned __int64 *)p_stOut);
+        TMR_pc_fn_vReadTSC((unsigned __int64 *)p_vTarget);
         break;
     }
 
