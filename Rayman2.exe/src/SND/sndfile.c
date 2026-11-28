@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <string.h>
-#include <windows.h>
 
 #include "SND/SND.h"
 #include "SND/sndfile.h"

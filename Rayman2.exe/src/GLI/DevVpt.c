@@ -9,8 +9,6 @@
 #include "TMR/TMR.h"
 #include "GLI/cpu_timer.h"
 
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
 #include "GLD/GLD_Pub.h"
 #include "GLD/Specif/DevVpt.h"
 #include "GAM/GAM_pc_DrawLock.h"

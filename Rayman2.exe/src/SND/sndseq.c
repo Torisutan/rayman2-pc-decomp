@@ -294,8 +294,6 @@ long SND_fn_lPlaySeq(tduRefRes res,SoundParam *par,long prio,SND_td_pfn_vSoundCa
 	return (C_PLAY_FAILED);
 }
 
-#include <windows.h>
-
 /* 0x0045AED0 */
 void SND_CALL SND_fn_vNextElement(long voice)
 {

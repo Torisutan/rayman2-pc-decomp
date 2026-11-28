@@ -1,9 +1,11 @@
 #include "GLI/timer_sub2.h"
 #include "TMR/TMR_globals.h"
 
+#ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <mmsystem.h>
+#endif
 
 void __cdecl TMR_pc_fn_vReadTSC(unsigned __int64 *p_uOut)
 {

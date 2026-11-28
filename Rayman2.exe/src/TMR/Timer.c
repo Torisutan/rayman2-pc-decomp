@@ -1,7 +1,5 @@
 #include "GLI/int64_arithmetic.h"
 
-#include <windows.h>
-
 #include "TMR/TMR.h"
 #include "ERM/CpaError.h"
 #include "GLI/int64_arithmetic.h"

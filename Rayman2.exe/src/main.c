@@ -1,4 +1,6 @@
+#ifdef WIN32
 #include <windows.h>
+#endif
 
 extern int __stdcall GAM_pc_fn_WinMain(HINSTANCE hInstance,
                              HINSTANCE hPrevInstance,

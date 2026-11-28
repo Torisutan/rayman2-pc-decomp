@@ -1,3 +1,7 @@
+#ifdef WIN32
+#include <windows.h>
+#endif
+
 #include "ERM/CpaError.h"
 #include "GLI/Init_Gli.h"
 

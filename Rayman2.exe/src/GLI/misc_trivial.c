@@ -15,9 +15,6 @@
 #include "GLI/Proj.h"
 #include "GLI/sprite.h"
 
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-
 static void *GLI_pc_g_p_vLensFlareRef;   /* 0x004A72A8 */
 unsigned long GLI_g_ul4a72b0_storage;   /* 0x004A72B0 */
 #define GLI_g_ul4a72b0   GLI_g_ul4a72b0_storage

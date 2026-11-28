@@ -1,4 +1,6 @@
+#ifdef WIN32
 #include <windows.h>
+#endif
 #include <stdint.h>
 
 #include "MMG/MMG_globals.h"
@@ -40,8 +42,6 @@ typedef struct Mmg_tdstBlockHeaderWithoutFree {
 
 typedef unsigned long Mmg_unitAlloc;
 
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
 #include <string.h>
 #include <stdint.h>
 
@@ -70,7 +70,6 @@ typedef struct MMG_tdstPoolMeta {
     uintptr_t ulCurrentEnd;
 } MMG_tdstPoolMeta;
 
-#include <windows.h>
 #include <string.h>
 #include <stdint.h>
 
@@ -87,7 +86,6 @@ typedef struct MMG_tdstPoolMeta {
 void *fn_p_vDynAlloc(uint32_t ulSize, unsigned char ucChannel);
 void  fn_vDynFree(void *pUser, unsigned char ucChannel);
 
-#include <windows.h>
 #include <string.h>
 
 #include "MMG/MMG_globals.h"

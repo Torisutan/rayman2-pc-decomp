@@ -6,6 +6,7 @@
   "/Gy",
   "/MD",
   "/Dinline=__inline",
+  "/DWIN32",
   "/W3"
  ],
  "include": [

@@ -5,7 +5,6 @@
 #include "GEO/GEO_globals.h"
 #include "ERM/CpaError.h"
 #include "GLI/Init_Gli_helpers.h"
-#include <windows.h>
 #include "GLI/GLD.h"
 
 void __cdecl GLI_xSetCameraNearFar(void *p_stCam, float xNear_unused, float xFar)

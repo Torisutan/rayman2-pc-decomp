@@ -1,6 +1,8 @@
 #pragma once
 
+#ifdef WIN32
 #include <windows.h>
+#endif
 
 #define INO_C_wNbMaxDevice      20
 #define INO_C_wNbMaxAxis         6

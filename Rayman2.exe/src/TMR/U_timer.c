@@ -3,8 +3,6 @@
 #include "GLI/timer_sub2.h"
 #include "GLI/int64_arithmetic.h"
 
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
 #include <string.h>
 #include "ERM/CpaError.h"
 

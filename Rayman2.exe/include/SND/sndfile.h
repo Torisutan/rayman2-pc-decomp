@@ -3,6 +3,10 @@
 
 #include "SND/snddef.h"
 
+#ifdef FILE_MODE_C_WIN95
+#include <windows.h>
+#endif
+
 #define OPENFILESND_READ		GENERIC_READ
 #define OPENFILESND_WRITE		GENERIC_WRITE
 #define OPENFILESND_FAILED		INVALID_HANDLE_VALUE

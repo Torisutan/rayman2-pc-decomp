@@ -1,7 +1,9 @@
 #pragma once
 
+#ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#endif
 
 /* 0x0049f07c */
 extern HINSTANCE g_hInstance_storage;

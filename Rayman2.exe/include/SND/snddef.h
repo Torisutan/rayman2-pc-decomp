@@ -7,6 +7,10 @@
 
 #define NB_MICRO_MAX 2
 
+#if !defined(GAMECONSOLE)  || defined(GENERIC)
+#define FILE_MODE_C_WIN95
+#endif
+
 #if !defined(GAMECONSOLE) || defined(WIN95) || defined(WIN32)
 
 #define SND_CALL WINAPI

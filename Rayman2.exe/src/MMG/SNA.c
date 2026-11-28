@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#ifdef WIN32
 #include <windows.h>
+#endif
 #include <intrin.h>
 
 #include "MMG/SNA.h"

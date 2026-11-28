@@ -1,7 +1,5 @@
 #pragma once
 
-#include <windows.h>
-
 typedef struct stTimerCount_ {
     unsigned long m_ulLowPart;
     unsigned long m_ulHighPart;

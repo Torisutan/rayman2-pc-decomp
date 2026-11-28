@@ -9,8 +9,10 @@ extern "C" {
 extern uint8_t MMG_g_ucActiveMode;
 extern uint8_t MMG_g_bAllocDisabled;
 
+#ifdef WIN32
 #include <windows.h>
 
+#endif
 extern CRITICAL_SECTION g_csMmg;
 
 void *__cdecl fn_p_vDynAlloc(uint32_t ulSize, unsigned char);

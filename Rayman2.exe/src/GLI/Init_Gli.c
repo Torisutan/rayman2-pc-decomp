@@ -20,8 +20,6 @@
 #include "GLI/texture_lifecycle.h"
 #include "GLI/devinfo.h"
 
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
 #include <string.h>
 #include "GLI/GLI_pc.h"
 

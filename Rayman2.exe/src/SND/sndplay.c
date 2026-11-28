@@ -1,6 +1,5 @@
 #include <stddef.h>
 #include <string.h>
-#include <windows.h>
 #include "SND/sndres.h"
 #include "SND/sndparam_pc.h"
 

@@ -6,9 +6,6 @@
 #include "GEO/GEO_globals.h"
 #include "ERM/CpaError.h"
 
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-
 #define GLI_g_ucMaterialAllocState  GEO_g_bDynamicAllocation
 
 #define GLI_g_ucMemoryModule        g_ucGEOModuleId        /* 0x0049fbbc */

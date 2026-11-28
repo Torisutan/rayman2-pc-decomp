@@ -1,6 +1,8 @@
 #pragma once
 
+#ifdef WIN32
 #include <windows.h>
+#endif
 #include <stdlib.h>
 
 #if defined(U64) || defined(NITRO)

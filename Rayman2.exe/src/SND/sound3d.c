@@ -2056,7 +2056,6 @@ void __cdecl SND_fn_vChangeVolumeSound(long indice, long type, long lNewVolume)
     SND_RT_fn_vQuitCriticalSectionThreadSnd();
 }
 
-#include <windows.h>
 #include "FIL/FIL_pc.h"
 #include "SND/sndfile.h"
 #include "ERM/CpaError.h"

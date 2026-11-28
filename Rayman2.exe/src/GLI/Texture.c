@@ -8,7 +8,6 @@
 #include "ERM/CpaError.h"
 #include "GLI/ui_reset_redraw.h"
 #include <string.h>
-#include <windows.h>
 
 extern unsigned char __cdecl FUN_0044f4e0(void);
 

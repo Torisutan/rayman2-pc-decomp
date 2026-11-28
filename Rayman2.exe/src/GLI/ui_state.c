@@ -1,6 +1,5 @@
 #include "GLI/ui_state.h"
 #include "GLI/GLI_globals.h"
-#include <windows.h>
 #include "GAM/GAM_pc_DrawLock.h"
 #include "TMP/TmpMem.h"
 #include "ERM/CpaError.h"

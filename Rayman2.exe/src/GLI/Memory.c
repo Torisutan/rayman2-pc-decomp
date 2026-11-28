@@ -2,8 +2,6 @@
 #include "MMG/MMG_alloc.h"
 #include "MMG/MMG_globals.h"
 
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
 #include <string.h>
 
 #include "ERM/CpaError.h"

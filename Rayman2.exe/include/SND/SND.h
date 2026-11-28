@@ -1,6 +1,8 @@
 #pragma once
 
+#ifdef WIN32
 #include <windows.h>
+#endif
 
 #ifndef SND_CALL
 #if !defined(GAMECONSOLE) || defined(WIN95) || defined(WIN32)

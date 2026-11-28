@@ -4,8 +4,10 @@
 #include "GLI/PixFmt.h"
 #include <string.h>
 
+#ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#endif
 
 /* 0x4A0808 */
 static unsigned long GLI_pc_aulDefinedPixelFormatTable[16 * 16] = {

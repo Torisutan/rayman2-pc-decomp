@@ -6,8 +6,6 @@
 #include "GLI/GLD.h"
 #include "GLD/GLD_Pub.h"
 
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
