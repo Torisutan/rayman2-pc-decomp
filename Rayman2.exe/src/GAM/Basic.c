@@ -51,7 +51,8 @@ extern void __cdecl CAM_fn_vUpdateTargetPosition(void *hCineinfo);
 extern void __cdecl fn_vInitAveragePositionDatasIfNecessary(void *hCineinfo);
 extern void __cdecl CAM_fn_vForceCameraPos(HIE_tdstSuperObject *hCamera, void *p_stPosition);
 extern void __cdecl CAM_fn_vForceCameraTgt(HIE_tdstSuperObject *hCamera, void *p_stPosition, void *p_stRefAxisZ);
-extern void *__cdecl SAI_fn_p_vGetTableValuePointerOf(void *p_vValue, int eFlags);
+
+extern void *__cdecl SAI_fn_p_vGetTableValuePointerOf(void *p_vValue, unsigned short eFlags);
 extern void __cdecl fn_vInitObjectsWhenPlayerChangeSector(long lUnused, void *p_pFirst, void *p_pSecond);
 extern void __cdecl GAM_pc_fn_vStopMatchingSounds(long lKey, void *p_pObject);
 

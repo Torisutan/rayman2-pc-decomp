@@ -14,8 +14,8 @@ extern unsigned char g_ucGameModuleId;
 typedef unsigned char (__cdecl *t_fn_ucIsAnAlwaysObject)(HIE_tdstEngineObject *p_stObject);
 
 extern void *__cdecl fn_h_DynamRealAlloc(void);  /* 0x00412C70 */
-extern void __cdecl fn_v_DynamicAlloc(void *h_Dynam, int eSize,
-                                      unsigned char bCollision, unsigned char bAlways);  /* 0x00412CA0 */
+extern void __cdecl fn_v_DynamicAlloc(void *h_Dynam, eDynamicSize eSize,
+                                      ACP_tdxBool bCollision, ACP_tdxBool bAlways);  /* 0x00412CA0 */
 /* 0x00412DF0 */
 void __cdecl fn_v_DynamicFree(MS_tdxHandleToDynam h_Dynam);
 #define DNM_fn_v_DynamicFree         fn_v_DynamicFree
@@ -101,7 +101,7 @@ void __cdecl fn_vDynamSetParsingDatas(MS_tdxHandleToDynam h_Dynam, void *p_stPar
 #include "ERM/CpaError.h"
 #include "GAM/GAM_types.h"
 void __cdecl fn_vInitOneObject(struct tdstEngineObject_ *p_stObject, int eObjIniType);
-extern void __cdecl fn_v_DynamicFree(void *param_1);
+extern void __cdecl fn_v_DynamicFree(MS_tdxHandleToDynam h_Dynam);
 void __cdecl fn_vGameFreeInHLM(void *p_vObject);
 extern void __cdecl DNM_fn_vInitBaseMechanic(void *_p_stDynamic);
 

@@ -20,6 +20,10 @@
 
 #include <string.h>
 
+
+
+long WPG_fn_lGetArcCapabilities(WP_tdhGraphNode hSrcNode, WP_tdhGraphNode hDstNode, unsigned long *p_ulCapability);
+
 /* 0x0047F590 */
 
 

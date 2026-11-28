@@ -33,8 +33,8 @@ unsigned char __cdecl fn_ucAreThereFloatIfYesConvertThem(AI_tdstGetSetParam *p_s
 
 #define AI_M_pfn_fn_p_stOperatorGetPerso  fn_p_stOperatorGetPerso
 /* 0x00481CB0 */
-extern void __cdecl fn_vOperatorGetDsgVar(unsigned char ucId, unsigned char ucIndex,
-                                          void *p_context, void *p_stGetSetParam);
+extern void __cdecl fn_vOperatorGetDsgVar(unsigned char ucVarId, unsigned char ucIndex,
+                                          HIE_tdstSuperObject *hSuperObjPerso, AI_tdstGetSetParam *p_stValue);
 #define AI_M_pfn_fn_vOperatorGetDsgVar  ((void (__cdecl *)(unsigned long, unsigned long, HIE_tdstSuperObject *, void *))&fn_vOperatorGetDsgVar)
 /* 0x00481D70 */
 extern void __cdecl fn_vOperatorGetField(unsigned long ulFieldId, void *p_stContext, void *p_stGetSetParam);
@@ -46,20 +46,22 @@ extern void __cdecl fn_vOperatorGetField(unsigned long ulFieldId, void *p_stCont
 extern unsigned char __cdecl fn_ucGetTreeNbParam(AI_tdstNodeInterpret *p_stTree);
 #define AI_M_pfn_fn_ucGetTreeNbParam   ((char (__cdecl *)(AI_tdstNodeInterpret *))&fn_ucGetTreeNbParam)
 /* 0x00482450 */
-extern void __cdecl fn_vGetFieldOrDsgVarForAffectOperator(void *p_stContext, unsigned long ulType,
-        unsigned long ulDsgVarId, unsigned long ulDsgVarIndex, long lFieldId, void *p_stGetSetParam);
+extern void __cdecl fn_vGetFieldOrDsgVarForAffectOperator(HIE_tdstSuperObject *hSuperObjPerso,
+        tdeTypeInterpret eTypeInterpret, unsigned char ucVarId, unsigned char ucIndex, long eFieldId  ,
+        AI_tdstGetSetParam *p_stValue);
 #define AI_M_pfn_fn_vGetFieldOrDsgVarForAffectOperator           ((void (__cdecl *)(HIE_tdstSuperObject *, unsigned long, unsigned long, unsigned long, long, void *))&fn_vGetFieldOrDsgVarForAffectOperator)
 /* 0x004824A0 */
-extern void __cdecl fn_vSetFieldOrDsgVarForAffectOperator(void *p_stContext, unsigned long ulType,
-        unsigned long ulDsgVarId, unsigned long ulDsgVarIndex, long lFieldId, void *p_stGetSetParam);
+extern void __cdecl fn_vSetFieldOrDsgVarForAffectOperator(HIE_tdstSuperObject *hSuperObjPerso,
+        tdeTypeInterpret eTypeInterpret, unsigned char ucVarId, unsigned char ucIndex, long eFieldId  ,
+        AI_tdstGetSetParam *p_stValue);
 #define AI_M_pfn_fn_vSetFieldOrDsgVarForAffectOperator          ((void (__cdecl *)(HIE_tdstSuperObject *, unsigned long, unsigned long, unsigned long, long, void *))&fn_vSetFieldOrDsgVarForAffectOperator)
 /* 0x00482420 */
-extern void __cdecl fn_vOperatorSetDsgVar(unsigned long ulId, unsigned long ulIndex,
-                                          void *p_context, void *p_stGetSetParam);
+extern void __cdecl fn_vOperatorSetDsgVar(unsigned char ucVarId, unsigned char ucIndex,
+                                          HIE_tdstSuperObject *hSuperObjPerso, AI_tdstGetSetParam *p_stValue);
 #define AI_M_pfn_fn_vOperatorSetDsgVar     ((void (__cdecl *)(unsigned long, unsigned long, HIE_tdstSuperObject *, void *))&fn_vOperatorSetDsgVar)
 /* 0x00482520 */
-extern void __cdecl fn_vSetVectorComponentForAffectOperator(unsigned char ucXYZflag, void *p_stVector, float xReal);
-extern void __cdecl fn_vBuildVectorForAffectOperator(char cComponent, void *p_stValue, float xValue);
+extern void __cdecl fn_vSetVectorComponentForAffectOperator(unsigned char ucXYZflag, MTH3D_tdstVector *p_stVector, MTH_tdxReal xReal);
+extern void __cdecl fn_vBuildVectorForAffectOperator(unsigned char ucXYZflag, AI_tdstGetSetParam *p_stParam, MTH_tdxReal xReal);
 #define AI_M_pfn_fn_vSetVectorComponentForAffectOperator   ((void (__cdecl *)(char, void *, float))&fn_vSetVectorComponentForAffectOperator)
 #define AI_M_pfn_fn_vBuildVectorForAffectOperator ((void (__cdecl *)(char, void *, float))&fn_vBuildVectorForAffectOperator)
 
@@ -323,7 +325,7 @@ AI_tdstNodeInterpret *__cdecl fn_p_stArrayOperator(
     p_stNext = fn_p_stEvalTree(
         p_SuperObjPerso, p_stArray + 1, (AI_tdstGetSetParam *)p_lValue);
 
-    fn_vOperatorGetDsgVar(ucId, (unsigned char)p_lValue[0], p_stObject, p_lValue);
+    fn_vOperatorGetDsgVar(ucId, (unsigned char)p_lValue[0], p_stObject, (AI_tdstGetSetParam *)p_lValue);
     return p_stNext;
 }
 
@@ -744,25 +746,33 @@ void __cdecl fn_vOperatorSetDsgVar(unsigned char ucVarId, unsigned char ucIndex,
 }
 
 /* 0x00482450 */
-void __cdecl fn_vGetFieldOrDsgVarForAffectOperator(void *p_stContext, unsigned long ulType,
-                                                   unsigned long ulDsgVarId, unsigned long ulDsgVarIndex,
-                                                   long lFieldId, void *p_stGetSetParam)
+void __cdecl fn_vGetFieldOrDsgVarForAffectOperator(HIE_tdstSuperObject *hSuperObjPerso,tdeTypeInterpret eTypeInterpret,unsigned char ucVarId,unsigned char ucIndex,tdeFieldId eFieldId,AI_tdstGetSetParam *p_stValue)
 {
-    if (ulType == 0x0B)
-        fn_vOperatorGetDsgVar(ulDsgVarId, ulDsgVarIndex, p_stContext, p_stGetSetParam);
-    else if (ulType == 9)
-        fn_vOperatorGetField((unsigned long)lFieldId, p_stContext, p_stGetSetParam);
+	if (eTypeInterpret==E_ti_DsgVarRef)
+	{
+
+        fn_vOperatorGetDsgVar(ucVarId,ucIndex,hSuperObjPerso,p_stValue);
+	}
+	else if (eTypeInterpret==E_ti_Field)
+	{
+
+		fn_vOperatorGetField(eFieldId,hSuperObjPerso,p_stValue);
+	}
 }
 
 /* 0x004824A0 */
-void __cdecl fn_vSetFieldOrDsgVarForAffectOperator(void *p_stContext, unsigned long ulType,
-                                                   unsigned long ulDsgVarId, unsigned long ulDsgVarIndex,
-                                                   long lFieldId, void *p_stGetSetParam)
+void __cdecl fn_vSetFieldOrDsgVarForAffectOperator(HIE_tdstSuperObject *hSuperObjPerso,tdeTypeInterpret eTypeInterpret,unsigned char ucVarId,unsigned char ucIndex,tdeFieldId eFieldId,AI_tdstGetSetParam *p_stValue)
 {
-    if (ulType == 0x0B)
-        fn_vOperatorSetDsgVar(ulDsgVarId, ulDsgVarIndex, p_stContext, p_stGetSetParam);
-    else if (ulType == 9)
-        fn_vOperatorSetField((unsigned long)lFieldId, p_stContext, p_stGetSetParam);
+  if (eTypeInterpret==E_ti_DsgVarRef)
+  {
+
+    fn_vOperatorSetDsgVar(ucVarId,ucIndex,hSuperObjPerso,p_stValue);
+  }
+  else if (eTypeInterpret==E_ti_Field)
+  {
+
+	fn_vOperatorSetField(eFieldId,hSuperObjPerso,p_stValue);
+  }
 }
 
 void __cdecl fn_vOperatorSetField(unsigned long ulFieldId, void *p_stContext,
