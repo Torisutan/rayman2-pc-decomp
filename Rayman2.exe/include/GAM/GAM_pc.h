@@ -110,8 +110,9 @@ unsigned int fn_uiEngineMainLoop(void);
 /* 0x004010B0 */
 void GAM_pc_fn_vChooseTheGoodInit(void);
 
-/* 0x00401540 */
+#ifndef USE_SDL
 DWORD WINAPI GAM_pc_fn_ulEngineThreadProc(LPVOID lpParameter);
+#endif
 
 /* 0x00401510 */
 void GAM_pc_fn_vCreateEngineThread(void);
@@ -122,8 +123,9 @@ void GAM_pc_fn_vKillEngineThreadAfterExit(void);
 /* 0x00401b20 */
 unsigned long FUN_00401b20(void);
 
-/* 0x00402580 */
+#ifndef USE_SDL
 int FUN_00402580(MSG *p_msg);
+#endif
 
 /* 0x00401050 */
 void FUN_00401050(void);
@@ -137,9 +139,10 @@ int GAM_fn_bCreateMainWindow(HINSTANCE hInstance, int iShowCmd);
 /* 0x00402150 */
 int __cdecl fn_bCreateMainDisplayScreen(void);
 
-/* 0x004022D0 */
+#ifndef USE_SDL
 LRESULT CALLBACK GAM_fn_WndProc(HWND hWnd, UINT uMsg, WPARAM wParam,
                                 LPARAM lParam);
+#endif
 
 /* 0x00401d40 */
 int __stdcall GAM_pc_fn_WinMain(HINSTANCE hInstance,

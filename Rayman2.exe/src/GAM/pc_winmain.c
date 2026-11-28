@@ -22,8 +22,10 @@ long __cdecl GLD_bReleaseViewportAndDevice(short hDev, short hVP);
 
 int __cdecl GAM_pc_fn_bAreBothEventsIdle(void);
 
+#ifndef USE_SDL
 __declspec(dllimport) DWORD WINAPI timeGetTime(void);
 #pragma comment(lib, "winmm.lib")
+#endif
 
 #ifdef WIN32
 #include <io.h>
@@ -888,7 +890,9 @@ int GAM_pc_fn_vHandleWmPowerBroadcast(WPARAM wParam, LPARAM lParam,
     return 1;
 }
 
+#ifndef USE_SDL
 int FUN_00402580(MSG *p_msg);
+#endif
 void GAM_pc_fn_vFreeMmgTableAndHelperDll(void);
 int GAM_fn_bCreateMainWindow(HINSTANCE hInstance, int iShowCmd);
 
@@ -1057,7 +1061,9 @@ int __stdcall GAM_pc_fn_WinMain(HINSTANCE hInstance,
     return -1;
 }
 
+#ifndef USE_SDL
 LRESULT CALLBACK GAM_fn_WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+#endif
 int __cdecl fn_bCreateMainDisplayScreen(void);
 
 /* 0x00402150 */

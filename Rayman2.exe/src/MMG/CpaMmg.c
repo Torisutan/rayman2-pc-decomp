@@ -361,7 +361,7 @@ void *__cdecl fn_p_vDynAlloc(uint32_t ulSize, unsigned char ucChannel)
 void __cdecl fn_vDynFree(void *pUser, unsigned char ucChannel)
 {
     Mmg_MEnterCriticalSection();
-    CPA_FREE((HGLOBAL)((uint8_t *)pUser - 4));
+    CPA_FREE((uint8_t *)pUser - 4);
     Mmg_MLeaveCriticalSection();
 }
 
@@ -1177,10 +1177,10 @@ void __cdecl Mmg_fn_vStopMmgModule(void)
 
     Mmg_MDeleteCriticalSection();
 
-    CPA_FREE((HGLOBAL)g_p_d_stCurrentModeInfo);
+    CPA_FREE(g_p_d_stCurrentModeInfo);
     g_p_d_stCurrentModeInfo = NULL;
 
-    CPA_FREE((HGLOBAL)MMG_M_p_TabChannelInfo);
+    CPA_FREE(MMG_M_p_TabChannelInfo);
     MMG_M_p_TabChannelInfo = NULL;
 }
 
