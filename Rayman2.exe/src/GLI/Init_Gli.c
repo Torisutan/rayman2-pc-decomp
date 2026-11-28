@@ -32,7 +32,7 @@ typedef void (__cdecl *pfn_GLI_DRV_xInitDriver_t)(HWND, DWORD, DWORD, DWORD, DWO
 static pfn_GLI_DRV_xInitDriver_t GLI_g_pfn_xInitDriver_storage;
 #define GLI_g_pfn_xInitDriver  (GLI_g_pfn_xInitDriver_storage)
 
-HMODULE GLI_g_hDll;
+GLI_tdhDriver GLI_g_hDll;
 
 typedef long (__cdecl *pfn_SetCommonData_t)(char const *, void *);
 
@@ -250,50 +250,50 @@ long __cdecl GLI_fnl_InitDll(void)
 
 #undef GLI_CB
 
-    *(FARPROC *)GLI_DRV_vDoOpaqueTextureSelection_PTR = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_vDoOpaqueTextureSelection");
-    *(FARPROC *)GLI_DRV_vWrite16bBitmapToBackBuffer = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_vWrite16bBitmapToBackBuffer");
-    *(FARPROC *)GLI_DRV_vAddBlackPolygon = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_vAddBlackPolygon");
-    *(FARPROC *)GLI_DRV_vNoBlackPolygon = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_vNoBlackPolygon");
-    *(FARPROC *)GLI_DRV_vComputeFogEffect_PTR = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_vComputeFogEffect");
-    *(FARPROC *)GLI_DRV_bBeginScene = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_bBeginScene");
+    *(GLI_tdpfnDriverProc *)GLI_DRV_vDoOpaqueTextureSelection_PTR = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_vDoOpaqueTextureSelection");
+    *(GLI_tdpfnDriverProc *)GLI_DRV_vWrite16bBitmapToBackBuffer = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_vWrite16bBitmapToBackBuffer");
+    *(GLI_tdpfnDriverProc *)GLI_DRV_vAddBlackPolygon = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_vAddBlackPolygon");
+    *(GLI_tdpfnDriverProc *)GLI_DRV_vNoBlackPolygon = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_vNoBlackPolygon");
+    *(GLI_tdpfnDriverProc *)GLI_DRV_vComputeFogEffect_PTR = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_vComputeFogEffect");
+    *(GLI_tdpfnDriverProc *)GLI_DRV_bBeginScene = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_bBeginScene");
     *GLI_DRV_bEndScene_              = (int  (*)(void))                                            GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_bEndScene");
     *GLI_DRV_vSendSpriteToClip_      = (void (*)(struct GLI_tdstAligned2DVector_ *, MTH_tdxReal, struct GLI_tdstInternalGlobalValuesFor3dEngine_ *))
                                        GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_vSendSpriteToClip");
     *GLI_DRV_vSendSpriteToClipWithUV_= (void (*)(struct GLI_tdstAligned2DVector_ *, MTH_tdxReal *, MTH_tdxReal, struct GLI_tdstInternalGlobalValuesFor3dEngine_ *))
                                        GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_vSendSpriteToClipWithUV");
-    *(FARPROC *)GLI_DRV_vSendSpriteToClipWithColors_ = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_vSendSpriteToClipWithColors");
+    *(GLI_tdpfnDriverProc *)GLI_DRV_vSendSpriteToClipWithColors_ = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_vSendSpriteToClipWithColors");
     *GLI_DRV_vSendSingleLineToClip_  = (void (*)(struct GLD_tdstViewportAttributes *, struct GLI_tdstAligned3DVector_ *, struct GLI_tdstAligned2DVector_ *, struct GLI_tdstAligned3DVector_ *, struct GLI_tdstAligned2DVector_ *, struct GLI_tdstInternalGlobalValuesFor3dEngine_ *, long, struct GEO_tdstColor *))
                                        GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_vSendSingleLineToClip");
-    *(FARPROC *)GLI_DRV_vDownLoadTextures = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_vDownLoadTextures");
-    *(FARPROC *)GLI_DRV_vUnLoadTextures = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_vUnLoadTextures");
-    *(FARPROC *)GLI_DRV_lGetSizeOfTexture = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_lGetSizeOfTexture");
+    *(GLI_tdpfnDriverProc *)GLI_DRV_vDownLoadTextures = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_vDownLoadTextures");
+    *(GLI_tdpfnDriverProc *)GLI_DRV_vUnLoadTextures = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_vUnLoadTextures");
+    *(GLI_tdpfnDriverProc *)GLI_DRV_lGetSizeOfTexture = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_lGetSizeOfTexture");
     *GLI_DRV_vFlipDevice             = (void (*)(void)) GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_vFlipDevice");
     *GLI_DRV_vFlipDeviceWithSyncro_  = (void (*)(void)) GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_vFlipDeviceWithSyncro");
-    *(FARPROC *)GLI_DRV_vClearDevice = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_vClearDevice");
-    *(FARPROC *)&GLI_g_pfn_xInitDriver = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_xInitDriver");
-    *(FARPROC *)GLI_DRV_vCloseDriver = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_vCloseDriver");
-    *(FARPROC *)GLI_DRV_vClearZBufferRegion = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_vClearZBufferRegion");
-    *(FARPROC *)GLI_DRV_fnl_EnumModes = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_fnl_EnumModes");
-    *(FARPROC *)GLI_DRV_hChangeMode = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_hChangeMode");
-    *(FARPROC *)GLI_DRV_bLockDevice = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_bLockDevice");
-    *(FARPROC *)GLI_DRV_bUnlockDevice = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_bUnlockDevice");
-    *(FARPROC *)GLI_DRV_bPrepareForGliWindowed = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_bPrepareForGliWindowed");
-    *(FARPROC *)GLI_DRV_vPrepareForGliFullScreen = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_vPrepareForGliFullScreen");
-    *(FARPROC *)GLI_DRV_vActivateGli = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_vActivateGli");
+    *(GLI_tdpfnDriverProc *)GLI_DRV_vClearDevice = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_vClearDevice");
+    *(GLI_tdpfnDriverProc *)&GLI_g_pfn_xInitDriver = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_xInitDriver");
+    *(GLI_tdpfnDriverProc *)GLI_DRV_vCloseDriver = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_vCloseDriver");
+    *(GLI_tdpfnDriverProc *)GLI_DRV_vClearZBufferRegion = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_vClearZBufferRegion");
+    *(GLI_tdpfnDriverProc *)GLI_DRV_fnl_EnumModes = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_fnl_EnumModes");
+    *(GLI_tdpfnDriverProc *)GLI_DRV_hChangeMode = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_hChangeMode");
+    *(GLI_tdpfnDriverProc *)GLI_DRV_bLockDevice = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_bLockDevice");
+    *(GLI_tdpfnDriverProc *)GLI_DRV_bUnlockDevice = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_bUnlockDevice");
+    *(GLI_tdpfnDriverProc *)GLI_DRV_bPrepareForGliWindowed = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_bPrepareForGliWindowed");
+    *(GLI_tdpfnDriverProc *)GLI_DRV_vPrepareForGliFullScreen = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_vPrepareForGliFullScreen");
+    *(GLI_tdpfnDriverProc *)GLI_DRV_vActivateGli = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_vActivateGli");
     *GLI_DRV_vReadaptDisplay_        = (void (*)(void)) GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_vReadaptDisplay");
-    *(FARPROC *)GLI_DRV_bWindowedModeIsOptimized = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_bWindowedModeIsOptimized");
-    *(FARPROC *)GLI_DRV_vOptimizedWindowedMode = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_vOptimizedWindowedMode");
-    *(FARPROC *)GLI_DRV_vNonOptimizedWindowedMode = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_vNonOptimizedWindowedMode");
-    *(FARPROC *)GLI_DRV_xClearViewingList = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_xClearViewingList");
+    *(GLI_tdpfnDriverProc *)GLI_DRV_bWindowedModeIsOptimized = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_bWindowedModeIsOptimized");
+    *(GLI_tdpfnDriverProc *)GLI_DRV_vOptimizedWindowedMode = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_vOptimizedWindowedMode");
+    *(GLI_tdpfnDriverProc *)GLI_DRV_vNonOptimizedWindowedMode = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_vNonOptimizedWindowedMode");
+    *(GLI_tdpfnDriverProc *)GLI_DRV_xClearViewingList = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_xClearViewingList");
     *GLI_DRV_xSendListToViewport_    = (void (*)(struct GLD_tdstViewportAttributes *)) GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_xSendListToViewport");
-    *(FARPROC *)GLI_DRV_vSetZClip_PTR = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_vSetZClip");
-    *(FARPROC *)GLI_DRV_vSetClipWindow_PTR = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_vSetClipWindow");
-    *(FARPROC *)GLI_DRV_xSendElementTIToClip_TRIANGLES = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_xSendElementTIToClip_TRIANGLES");
+    *(GLI_tdpfnDriverProc *)GLI_DRV_vSetZClip_PTR = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_vSetZClip");
+    *(GLI_tdpfnDriverProc *)GLI_DRV_vSetClipWindow_PTR = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_vSetClipWindow");
+    *(GLI_tdpfnDriverProc *)GLI_DRV_xSendElementTIToClip_TRIANGLES = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_xSendElementTIToClip_TRIANGLES");
 
     *GLI_DRV_vSendSingleTrianglesToClip_ = (void (*)(struct GLI_tdstAligned2DVector_ *, struct GLI_tdst2DUVValues_ *, struct GLI_tdstInternalGlobalValuesFor3dEngine_ *))
                                            GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_xSendSingleTriangleToClip_TRIANGLES");
 
-    *(FARPROC *)GLI_DRV_lRequest = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_lRequest");
+    *(GLI_tdpfnDriverProc *)GLI_DRV_lRequest = GLI_pc_M_pfnGetDriverProc(GLI_g_hDll,"GLI_DRV_lRequest");
 
     return 1;
 }
