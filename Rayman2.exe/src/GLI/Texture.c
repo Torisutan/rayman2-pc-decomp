@@ -13,10 +13,12 @@
 extern unsigned char __cdecl FUN_0044f4e0(void);
 
 static const unsigned long  k_xBP_One_bits      = 0x3F800000UL;       /* 0x0049c9a8 */
-static const unsigned __int64 k_dBP_RecipFF_bits = 0x3F70101010101010ui64; /* 0x0049c9b0 */
+
+#define M_U64(hi, lo) (((unsigned __int64)(hi) << 32) | (unsigned __int64)(lo))
+static const unsigned __int64 k_dBP_RecipFF_bits = M_U64(0x3F701010UL, 0x10101010UL); /* 0x0049c9b0 */
 static const unsigned long  k_xBP_255_bits      = 0x437F0000UL;       /* 0x0049c9b8 */
-static const unsigned __int64 k_dBP_One_bits    = 0x3FF0000000000000ui64; /* 0x0049c9c0 */
-static const unsigned __int64 k_dBP_Neg255_bits = 0xC06FE00000000000ui64; /* 0x0049c9c8 */
+static const unsigned __int64 k_dBP_One_bits    = M_U64(0x3FF00000UL, 0x00000000UL); /* 0x0049c9c0 */
+static const unsigned __int64 k_dBP_Neg255_bits = M_U64(0xC06FE000UL, 0x00000000UL); /* 0x0049c9c8 */
 #define GLI_BP_K_xOne     (*(const float  *)&k_xBP_One_bits)
 #define GLI_BP_K_dRecipFF (*(const double *)&k_dBP_RecipFF_bits)
 #define GLI_BP_K_x255     (*(const float  *)&k_xBP_255_bits)
@@ -25,21 +27,12 @@ static const unsigned __int64 k_dBP_Neg255_bits = 0xC06FE00000000000ui64; /* 0x0
 
 #define GLI_HALF_SUM_MASK_32 0x7f7f7f7fu
 
-/* 0x0045feb0 */
 static long gli_ftol_truncate(float xVal)
 {
     long  lResult;
     short uwOldCW, uwTrunCW;
-    __asm {
-        fnstcw word ptr [uwOldCW]
-        mov    ax, word ptr [uwOldCW]
-        or     ah, 0x0c
-        mov    word ptr [uwTrunCW], ax
-        fldcw  word ptr [uwTrunCW]
-        fld    dword ptr [xVal]
-        fistp  dword ptr [lResult]
-        fldcw  word ptr [uwOldCW]
-    }
+    uwOldCW = uwTrunCW = 0;
+    lResult = (long)xVal;
     return lResult;
 }
 
@@ -199,16 +192,16 @@ void __cdecl GLI_DivideBitmapSurfaceBy2Palette(unsigned char *pIndexBuffer,
 {
     /* 0x0049c580 */
     static const unsigned __int64 k_dYIQ_bits[10] = {
-        0x3FE2C8B439581062ui64,  /* 0x0049c580 */
-        0xBFBD2F1A9FBE76C9ui64,  /* 0x0049c588 */
-        0xBFD322D0E5604189ui64,  /* 0x0049c590 */
-        0x3FE3126E978D4FDFui64,  /* 0x0049c598 */
-        0x3FD189374BC6A7F0ui64,  /* 0x0049c5a0 */
-        0x3FD49BA5E353F7CFui64,  /* 0x0049c5a8 */
-        0x3FD3E76C8B439581ui64,  /* 0x0049c5b0 */
-        0xBFCB020C49BA5E35ui64,  /* 0x0049c5b8 */
-        0xBFE0B4395810624Eui64,  /* 0x0049c5c0 */
-        0x3FD0000000000000ui64   /* 0x0049c5c8 */
+        M_U64(0x3FE2C8B4UL, 0x39581062UL),  /* 0x0049c580 */
+        M_U64(0xBFBD2F1AUL, 0x9FBE76C9UL),  /* 0x0049c588 */
+        M_U64(0xBFD322D0UL, 0xE5604189UL),  /* 0x0049c590 */
+        M_U64(0x3FE3126EUL, 0x978D4FDFUL),  /* 0x0049c598 */
+        M_U64(0x3FD18937UL, 0x4BC6A7F0UL),  /* 0x0049c5a0 */
+        M_U64(0x3FD49BA5UL, 0xE353F7CFUL),  /* 0x0049c5a8 */
+        M_U64(0x3FD3E76CUL, 0x8B439581UL),  /* 0x0049c5b0 */
+        M_U64(0xBFCB020CUL, 0x49BA5E35UL),  /* 0x0049c5b8 */
+        M_U64(0xBFE0B439UL, 0x5810624EUL),  /* 0x0049c5c0 */
+        M_U64(0x3FD00000UL, 0x00000000UL)   /* 0x0049c5c8 */
     };
 #define GLI_DP_K(i) (*(const double *)&k_dYIQ_bits[(i)])
 

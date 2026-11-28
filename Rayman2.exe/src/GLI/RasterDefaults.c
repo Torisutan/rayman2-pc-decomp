@@ -35,7 +35,7 @@ void __cdecl FUN_00423ab0(void)
     GLI_RD_g_xMagic7244 = (float)(pow(2.0, 23.0) * 3.0);
 
     if (GLI_RD_g_bCosTableInit != 0) {
-        static const unsigned __int64 kStepBits = 0x3FB921FB60000000ui64;
+        static const unsigned __int64 kStepBits = ((unsigned __int64)0x3FB921FBUL << 32) | 0x60000000UL;
         const double kStep = *(const double *)&kStepBits;
         float *p_aTable = GLI_M_p2CosTable;
         int i;
