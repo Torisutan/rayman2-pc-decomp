@@ -189,3 +189,7 @@ unsigned char __cdecl fn_ucGetProcedureUltraOperator(unsigned long eProcId)
 {
     return (a_stProcedureTable[eProcId].bUltraProcedureFlag);
 }
+AI_tdp_fn_p_stProcedureFunctionPtr __cdecl fn_p_fn_pGetProcedureFunctionPtr(unsigned long eProcId)
+{
+    return a_stProcedureTable[eProcId].p_fn_p_stProcedureFunction;
+}

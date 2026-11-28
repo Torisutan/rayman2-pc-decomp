@@ -73,8 +73,7 @@ void __cdecl GLI_xSendObjectToViewport(
     struct GLD_tdstViewportAttributes *p_stVpt,
     void                              *p_stObj,
     void                              *p_stLight,
-    long                               lDrawModeMask,
-    long                               lHieFlags)
+    long                               lDrawModeMask)
 {
     struct GLI_tdstLight_ stAmbientLight;
     float         xSavedAlpha;
@@ -225,6 +224,112 @@ typedef void (__cdecl *GLI_pfn_vDoMaterialSelection_t)(void *p_stGlobals);
 typedef void (__cdecl *GLI_pfn_xPerspectiveProject_t)(
     void *p_stCam, long lCount, float *p_stSource, float *p_stDest);
 
+static const float GLI_gs_xOnePercent = 0.01f;   /* 0x0049c618 */
+#define GLI_g_xOnePercent_ADDR  (&GLI_gs_xOnePercent)
+
+unsigned char g_GLI_bForceAAAColor;   /* 0x004A72AC */
+#define GLI_g_bDrawingText_ADDR ((const unsigned char *)&g_GLI_bForceAAAColor)
+
+unsigned char GLI_g_aForcedAAAColor_ADDR[3];   /* 0x00503748 */
+
+#define GLI_GLOBALS_ulColorInitForSprite_OFFSET  0x2d3d4
+
+void __cdecl GLI_vDraw2DSpriteWithPercent(
+    struct GLD_tdstViewportAttributes *p_stViewport,
+    MTH_tdxReal XMin, MTH_tdxReal YMin,
+    MTH_tdxReal XMax, MTH_tdxReal YMax,
+    void *hMaterial)
+{
+    char *p_stGlobals = (char *)GLI_BIG_GLOBALS;
+
+    unsigned int ulRightInPix  = p_stViewport->dwWidth;
+    unsigned int ulBottomInPix = p_stViewport->dwHeight;
+
+    float fWidth, fHeight;
+    float fXMinScaled, fXMaxScaled, fYMinScaled, fYMaxScaled;
+    fWidth  = MTH_M_xLongToReal(ulRightInPix);
+    fXMinScaled = XMin * *GLI_g_xOnePercent_ADDR * fWidth;
+    fXMaxScaled = XMax * *GLI_g_xOnePercent_ADDR * fWidth;
+    fHeight = MTH_M_xLongToReal(ulBottomInPix);
+    fYMinScaled = YMin * *GLI_g_xOnePercent_ADDR * fHeight;
+    fYMaxScaled = YMax * *GLI_g_xOnePercent_ADDR * fHeight;
+
+    {
+
+    struct { float xX, xY, xOoZ, _pad; } aQuad[4];
+    aQuad[0].xX = fXMaxScaled;  aQuad[0].xY = fYMinScaled;  aQuad[0].xOoZ = 1.0f;
+    aQuad[1].xX = fXMinScaled;  aQuad[1].xY = fYMinScaled;  aQuad[1].xOoZ = 1.0f;
+    aQuad[2].xX = fXMinScaled;  aQuad[2].xY = fYMaxScaled;  aQuad[2].xOoZ = 1.0f;
+    aQuad[3].xX = fXMaxScaled;  aQuad[3].xY = fYMaxScaled;  aQuad[3].xOoZ = 1.0f;
+
+    *(void **)(p_stGlobals + GLI_GLOBALS_hCurrentMaterial_OFFSET) = hMaterial;
+    p_stGlobals = (char *)GLI_BIG_GLOBALS;
+
+    {
+        void *hMat = *(void **)(p_stGlobals + GLI_GLOBALS_hCurrentMaterial_OFFSET);
+        *(unsigned long *)hMat = GLI_SPRITE_MATERIAL_MASK;
+    }
+    p_stGlobals = (char *)GLI_BIG_GLOBALS;
+    *(unsigned long *)(p_stGlobals + GLI_GLOBALS_lHierachDrawMask_OFFSET) = GLI_SPRITE_MATERIAL_MASK;
+    p_stGlobals = (char *)GLI_BIG_GLOBALS;
+    *(unsigned long *)(p_stGlobals + GLI_GLOBALS_lCurrentDrawMask_OFFSET) = GLI_SPRITE_MATERIAL_MASK;
+
+    {
+        GLI_pfn_vDoMaterialSelection_t fn_vDoMaterialSelection =
+            (GLI_pfn_vDoMaterialSelection_t)&GLI_vDoMaterialSelection;
+        p_stGlobals = (char *)GLI_BIG_GLOBALS;
+        fn_vDoMaterialSelection(p_stGlobals);
+    }
+    p_stGlobals = (char *)GLI_BIG_GLOBALS;
+    *(unsigned long *)(p_stGlobals + GLI_GLOBALS_xTextureDontAcceptFog_OFFSET) = 1;
+
+    if (*GLI_g_bDrawingText_ADDR != 0) {
+
+        unsigned long ulAlphaMask;
+        unsigned long ulFullColor;
+        unsigned long ulForcedColor;
+        unsigned long aColors[4];
+
+        p_stGlobals = (char *)GLI_BIG_GLOBALS;
+        ulAlphaMask = *(unsigned long *)(p_stGlobals + GLI_GLOBALS_ulColorInitForSprite_OFFSET)
+                    & 0xff000000UL;
+
+        ulFullColor = ulAlphaMask | 0x00ffffffUL;
+
+        /* 0x4297ae */
+        {
+            unsigned char r = GLI_g_aForcedAAAColor_ADDR[0];
+            unsigned char g = GLI_g_aForcedAAAColor_ADDR[1];
+            unsigned char b = GLI_g_aForcedAAAColor_ADDR[2];
+            ulForcedColor = ulAlphaMask
+                          | ((unsigned long)r << 16)
+                          | ((unsigned long)g <<  8)
+                          | (unsigned long)b;
+        }
+
+        aColors[0] = ulFullColor;
+        aColors[1] = ulFullColor;
+        aColors[2] = ulForcedColor;
+        aColors[3] = ulForcedColor;
+
+        p_stGlobals = (char *)GLI_BIG_GLOBALS;
+        (*GLI_DRV_vSendSpriteToClipWithColors_)(
+            (struct GLI_tdstAligned2DVector_ *)&aQuad[0],
+            aColors,
+            *(unsigned long *)GLI_g_fZValueForSprite_ADDR,
+            (struct GLI_tdstInternalGlobalValuesFor3dEngine_ *)p_stGlobals);
+    } else {
+
+        p_stGlobals = (char *)GLI_BIG_GLOBALS;
+        (*GLI_DRV_vSendSpriteToClip_)(
+            (struct GLI_tdstAligned2DVector_ *)&aQuad[0],
+            *(MTH_tdxReal *)GLI_g_fZValueForSprite_ADDR,
+            (struct GLI_tdstInternalGlobalValuesFor3dEngine_ *)p_stGlobals);
+    }
+
+    }
+}
+
 unsigned char __cdecl GLI_vDrawWorldSprite(
     MTH3D_tdstVector           *pPosition,
     void                       *hMaterial,
@@ -335,112 +440,6 @@ unsigned char __cdecl GLI_vDrawWorldSprite(
 
     /* 0x4a7270 */
     return *GLI_g_bAnimFinishedFlag_ADDR;
-}
-
-static const float GLI_gs_xOnePercent = 0.01f;   /* 0x0049c618 */
-#define GLI_g_xOnePercent_ADDR  (&GLI_gs_xOnePercent)
-
-unsigned char g_GLI_bForceAAAColor;   /* 0x004A72AC */
-#define GLI_g_bDrawingText_ADDR ((const unsigned char *)&g_GLI_bForceAAAColor)
-
-unsigned char GLI_g_aForcedAAAColor_ADDR[3];   /* 0x00503748 */
-
-#define GLI_GLOBALS_ulColorInitForSprite_OFFSET  0x2d3d4
-
-void __cdecl GLI_vDraw2DSpriteWithPercent(
-    struct GLD_tdstViewportAttributes *p_stViewport,
-    MTH_tdxReal XMin, MTH_tdxReal YMin,
-    MTH_tdxReal XMax, MTH_tdxReal YMax,
-    void *hMaterial)
-{
-    char *p_stGlobals = (char *)GLI_BIG_GLOBALS;
-
-    unsigned int ulRightInPix  = p_stViewport->dwWidth;
-    unsigned int ulBottomInPix = p_stViewport->dwHeight;
-
-    float fWidth, fHeight;
-    float fXMinScaled, fXMaxScaled, fYMinScaled, fYMaxScaled;
-    fWidth  = MTH_M_xLongToReal(ulRightInPix);
-    fXMinScaled = XMin * *GLI_g_xOnePercent_ADDR * fWidth;
-    fXMaxScaled = XMax * *GLI_g_xOnePercent_ADDR * fWidth;
-    fHeight = MTH_M_xLongToReal(ulBottomInPix);
-    fYMinScaled = YMin * *GLI_g_xOnePercent_ADDR * fHeight;
-    fYMaxScaled = YMax * *GLI_g_xOnePercent_ADDR * fHeight;
-
-    {
-
-    struct { float xX, xY, xOoZ, _pad; } aQuad[4];
-    aQuad[0].xX = fXMaxScaled;  aQuad[0].xY = fYMinScaled;  aQuad[0].xOoZ = 1.0f;
-    aQuad[1].xX = fXMinScaled;  aQuad[1].xY = fYMinScaled;  aQuad[1].xOoZ = 1.0f;
-    aQuad[2].xX = fXMinScaled;  aQuad[2].xY = fYMaxScaled;  aQuad[2].xOoZ = 1.0f;
-    aQuad[3].xX = fXMaxScaled;  aQuad[3].xY = fYMaxScaled;  aQuad[3].xOoZ = 1.0f;
-
-    *(void **)(p_stGlobals + GLI_GLOBALS_hCurrentMaterial_OFFSET) = hMaterial;
-    p_stGlobals = (char *)GLI_BIG_GLOBALS;
-
-    {
-        void *hMat = *(void **)(p_stGlobals + GLI_GLOBALS_hCurrentMaterial_OFFSET);
-        *(unsigned long *)hMat = GLI_SPRITE_MATERIAL_MASK;
-    }
-    p_stGlobals = (char *)GLI_BIG_GLOBALS;
-    *(unsigned long *)(p_stGlobals + GLI_GLOBALS_lHierachDrawMask_OFFSET) = GLI_SPRITE_MATERIAL_MASK;
-    p_stGlobals = (char *)GLI_BIG_GLOBALS;
-    *(unsigned long *)(p_stGlobals + GLI_GLOBALS_lCurrentDrawMask_OFFSET) = GLI_SPRITE_MATERIAL_MASK;
-
-    {
-        GLI_pfn_vDoMaterialSelection_t fn_vDoMaterialSelection =
-            (GLI_pfn_vDoMaterialSelection_t)&GLI_vDoMaterialSelection;
-        p_stGlobals = (char *)GLI_BIG_GLOBALS;
-        fn_vDoMaterialSelection(p_stGlobals);
-    }
-    p_stGlobals = (char *)GLI_BIG_GLOBALS;
-    *(unsigned long *)(p_stGlobals + GLI_GLOBALS_xTextureDontAcceptFog_OFFSET) = 1;
-
-    if (*GLI_g_bDrawingText_ADDR != 0) {
-
-        unsigned long ulAlphaMask;
-        unsigned long ulFullColor;
-        unsigned long ulForcedColor;
-        unsigned long aColors[4];
-
-        p_stGlobals = (char *)GLI_BIG_GLOBALS;
-        ulAlphaMask = *(unsigned long *)(p_stGlobals + GLI_GLOBALS_ulColorInitForSprite_OFFSET)
-                    & 0xff000000UL;
-
-        ulFullColor = ulAlphaMask | 0x00ffffffUL;
-
-        /* 0x4297ae */
-        {
-            unsigned char r = GLI_g_aForcedAAAColor_ADDR[0];
-            unsigned char g = GLI_g_aForcedAAAColor_ADDR[1];
-            unsigned char b = GLI_g_aForcedAAAColor_ADDR[2];
-            ulForcedColor = ulAlphaMask
-                          | ((unsigned long)r << 16)
-                          | ((unsigned long)g <<  8)
-                          | (unsigned long)b;
-        }
-
-        aColors[0] = ulFullColor;
-        aColors[1] = ulFullColor;
-        aColors[2] = ulForcedColor;
-        aColors[3] = ulForcedColor;
-
-        p_stGlobals = (char *)GLI_BIG_GLOBALS;
-        (*GLI_DRV_vSendSpriteToClipWithColors_)(
-            (struct GLI_tdstAligned2DVector_ *)&aQuad[0],
-            aColors,
-            *(unsigned long *)GLI_g_fZValueForSprite_ADDR,
-            (struct GLI_tdstInternalGlobalValuesFor3dEngine_ *)p_stGlobals);
-    } else {
-
-        p_stGlobals = (char *)GLI_BIG_GLOBALS;
-        (*GLI_DRV_vSendSpriteToClip_)(
-            (struct GLI_tdstAligned2DVector_ *)&aQuad[0],
-            *(MTH_tdxReal *)GLI_g_fZValueForSprite_ADDR,
-            (struct GLI_tdstInternalGlobalValuesFor3dEngine_ *)p_stGlobals);
-    }
-
-    }
 }
 
 /* 0x00429F70 */
@@ -1291,6 +1290,50 @@ void __cdecl GLI_pc_fn_vTransformObjectVertices(char *p_stGlobals)
     }
 }
 
+void __cdecl GLI_pc_fn_vTransformObjectVerticesSinus(char *p_stGlobals)
+{
+    GLI_tdstCamera   *p_stCam;
+    MTH3D_tdstVector  stI, stJ, stK, stT;
+    float             fVar2, fVar3, fVar4;
+    float             fScaleX, fScaleY;
+    float            *pfVar5;
+    float            *pfVar6;
+    float            *pfVar7;
+    float            *pfEnd;
+    float             fZ;
+    float             fRecip;
+
+    p_stCam = ((struct GLI_tdstInternalGlobalValuesFor3dEngine_ *)p_stGlobals)->p_stCurrentCamera;
+    fScaleX = p_stCam->stScale.xX * p_stCam->xScreen;
+    fScaleY = p_stCam->stScale.xY * p_stCam->xScreen;
+    POS_fn_vGetTransformMatrix((POS_tdstCompletePosition *)(p_stGlobals + 0x2d344), &stI, &stJ, &stK);
+    fVar4 = stK.xY; fVar3 = stK.xX; fVar2 = stJ.xX;
+    stJ.xX = stI.xY; stK.xX = stI.xZ; stI.xY = fVar2;
+    stK.xY = stJ.xZ; stJ.xZ = fVar4; stI.xZ = fVar3;
+    POS_fn_vGetTranslationVector((POS_tdstCompletePosition *)(p_stGlobals + 0x2d344), &stT);
+
+    pfVar5 = (float *)(p_stGlobals + 0x2c);
+    pfVar7 = *(float **)(*(char **)(p_stGlobals + 4));
+    pfEnd  = pfVar5 + *(short *)(*(char **)(p_stGlobals + 4) + 0x2c) * 4;
+    if (pfVar5 < pfEnd) {
+        do {
+            pfVar5[0] = pfVar7[2] * stI.xZ + pfVar7[0] * stI.xX + pfVar7[1] * stI.xY + stT.xX;
+            pfVar5[1] = pfVar7[2] * stJ.xZ + pfVar7[0] * stJ.xX + pfVar7[1] * stJ.xY + stT.xY;
+            pfVar5[2] = pfVar7[2] * stK.xZ + pfVar7[0] * stK.xX + pfVar7[1] * stK.xY + stT.xZ;
+            GLI_pc_fn_vOffsetPointBySinusEffect(pfVar5);
+            fZ = pfVar5[2];
+
+            fRecip = MTH_fn_fInverseOpt(fZ);
+            pfVar5[10000] = pfVar5[0] * fRecip * fScaleX + p_stCam->stTrans.xX;
+            pfVar6 = pfVar5 + 4;
+            pfVar7 = pfVar7 + 3;
+            pfVar5[0x2711] = fRecip * fScaleY * pfVar5[1] + p_stCam->stTrans.xY;
+            pfVar5[0x2712] = p_stCam->xNear * fRecip;
+            pfVar5 = pfVar6;
+        } while (pfVar6 < pfEnd);
+    }
+}
+
 void __cdecl GLI_pc_fn_vTransformObjectVerticesClipped(char *p_stGlobals)
 {
     GLI_tdstCamera   *p_stCam;
@@ -1338,50 +1381,6 @@ void __cdecl GLI_pc_fn_vTransformObjectVerticesClipped(char *p_stGlobals)
             pfVar6 = pfVar6 + 4;
             pfVar7 = pfVar7 + 3;
         } while (pfVar8 < pfVar4);
-    }
-}
-
-void __cdecl GLI_pc_fn_vTransformObjectVerticesSinus(char *p_stGlobals)
-{
-    GLI_tdstCamera   *p_stCam;
-    MTH3D_tdstVector  stI, stJ, stK, stT;
-    float             fVar2, fVar3, fVar4;
-    float             fScaleX, fScaleY;
-    float            *pfVar5;
-    float            *pfVar6;
-    float            *pfVar7;
-    float            *pfEnd;
-    float             fZ;
-    float             fRecip;
-
-    p_stCam = ((struct GLI_tdstInternalGlobalValuesFor3dEngine_ *)p_stGlobals)->p_stCurrentCamera;
-    fScaleX = p_stCam->stScale.xX * p_stCam->xScreen;
-    fScaleY = p_stCam->stScale.xY * p_stCam->xScreen;
-    POS_fn_vGetTransformMatrix((POS_tdstCompletePosition *)(p_stGlobals + 0x2d344), &stI, &stJ, &stK);
-    fVar4 = stK.xY; fVar3 = stK.xX; fVar2 = stJ.xX;
-    stJ.xX = stI.xY; stK.xX = stI.xZ; stI.xY = fVar2;
-    stK.xY = stJ.xZ; stJ.xZ = fVar4; stI.xZ = fVar3;
-    POS_fn_vGetTranslationVector((POS_tdstCompletePosition *)(p_stGlobals + 0x2d344), &stT);
-
-    pfVar5 = (float *)(p_stGlobals + 0x2c);
-    pfVar7 = *(float **)(*(char **)(p_stGlobals + 4));
-    pfEnd  = pfVar5 + *(short *)(*(char **)(p_stGlobals + 4) + 0x2c) * 4;
-    if (pfVar5 < pfEnd) {
-        do {
-            pfVar5[0] = pfVar7[2] * stI.xZ + pfVar7[0] * stI.xX + pfVar7[1] * stI.xY + stT.xX;
-            pfVar5[1] = pfVar7[2] * stJ.xZ + pfVar7[0] * stJ.xX + pfVar7[1] * stJ.xY + stT.xY;
-            pfVar5[2] = pfVar7[2] * stK.xZ + pfVar7[0] * stK.xX + pfVar7[1] * stK.xY + stT.xZ;
-            GLI_pc_fn_vOffsetPointBySinusEffect(pfVar5);
-            fZ = pfVar5[2];
-
-            fRecip = MTH_fn_fInverseOpt(fZ);
-            pfVar5[10000] = pfVar5[0] * fRecip * fScaleX + p_stCam->stTrans.xX;
-            pfVar6 = pfVar5 + 4;
-            pfVar7 = pfVar7 + 3;
-            pfVar5[0x2711] = fRecip * fScaleY * pfVar5[1] + p_stCam->stTrans.xY;
-            pfVar5[0x2712] = p_stCam->xNear * fRecip;
-            pfVar5 = pfVar6;
-        } while (pfVar6 < pfEnd);
     }
 }
 

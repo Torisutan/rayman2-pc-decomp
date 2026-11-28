@@ -202,33 +202,6 @@ void fn_vFillDynamicHierarchy(HIE_tdstSuperObject *_hSOCurrentSector, ACP_tdxBoo
     }
 }
 
-void fn_vDesinitInactivePerso()
-{
-	HIE_tdxHandleToSuperObject hCharacter,hChild;
-
-	for (hCharacter = gp_stInactiveDynamicWorld->p_stFirstChild; hCharacter != NULL; hCharacter = hCharacter->p_stNextBrother)
-	{
-		if (M_ObjectIsActive((struct tdstEngineObject_*)HIE_fn_hGetSuperObjectObject(hCharacter)))
-		{
-			if( fn_ucStandardGameGetPlatFormType(M_GetMSHandle(hCharacter,StandardGame))!=0 )
-			{
-				for (hChild = hCharacter->p_stFirstChild; hChild != NULL; hChild = hChild->p_stNextBrother)
-				{
-					if (hChild->ulTypeOfLinkedObject == HIE_C_ulActor)
-					{
-						PLA_fn_vDesInitAllChildOfCharacter(hChild,(struct tdstEngineObject_*)HIE_fn_hGetSuperObjectObject(hChild));
-						M_UnactivateObject((struct tdstEngineObject_*)HIE_fn_hGetSuperObjectObject(hChild));
-						SND_fn_vKillObjectSound2((long)hChild,GAM_g_lSoundObjectTypeAnim);
-					}
-				}
-			}
-			PLA_fn_vDesInitAllChildOfCharacter(hCharacter,(struct tdstEngineObject_*)HIE_fn_hGetSuperObjectObject(hCharacter));
-			M_UnactivateObject((struct tdstEngineObject_*)HIE_fn_hGetSuperObjectObject(hCharacter));
-			SND_fn_vKillObjectSound2((long)hCharacter,GAM_g_lSoundObjectTypeAnim);
-		}
-	}
-}
-
 void fn_vClearDynamicHierarchy(HIE_tdstSuperObject *_hSOCurrentSector)
 {
     HIE_tdstSuperObject *hCharacter;
@@ -274,6 +247,33 @@ void fn_vClearDynamicHierarchy(HIE_tdstSuperObject *_hSOCurrentSector)
             ((SECT_tdxHandleOfSectorObject)hChildSector->hLinkedObject.p_Void)->cCounter = cCounter;
         }
     }
+}
+
+void fn_vDesinitInactivePerso()
+{
+	HIE_tdxHandleToSuperObject hCharacter,hChild;
+
+	for (hCharacter = gp_stInactiveDynamicWorld->p_stFirstChild; hCharacter != NULL; hCharacter = hCharacter->p_stNextBrother)
+	{
+		if (M_ObjectIsActive((struct tdstEngineObject_*)HIE_fn_hGetSuperObjectObject(hCharacter)))
+		{
+			if( fn_ucStandardGameGetPlatFormType(M_GetMSHandle(hCharacter,StandardGame))!=0 )
+			{
+				for (hChild = hCharacter->p_stFirstChild; hChild != NULL; hChild = hChild->p_stNextBrother)
+				{
+					if (hChild->ulTypeOfLinkedObject == HIE_C_ulActor)
+					{
+						PLA_fn_vDesInitAllChildOfCharacter(hChild,(struct tdstEngineObject_*)HIE_fn_hGetSuperObjectObject(hChild));
+						M_UnactivateObject((struct tdstEngineObject_*)HIE_fn_hGetSuperObjectObject(hChild));
+						SND_fn_vKillObjectSound2((long)hChild,GAM_g_lSoundObjectTypeAnim);
+					}
+				}
+			}
+			PLA_fn_vDesInitAllChildOfCharacter(hCharacter,(struct tdstEngineObject_*)HIE_fn_hGetSuperObjectObject(hCharacter));
+			M_UnactivateObject((struct tdstEngineObject_*)HIE_fn_hGetSuperObjectObject(hCharacter));
+			SND_fn_vKillObjectSound2((long)hCharacter,GAM_g_lSoundObjectTypeAnim);
+		}
+	}
 }
 
 void *__cdecl fn_h_SectInfoGetCurrentSector(void *h_SectInfo);   /* 0x00419B90 */
@@ -936,6 +936,37 @@ void fn_vDisplayAll(void)
 #define GAM_g_r_stFixViewportAttr   (*(struct GLD_tdstViewportAttributes_ *)GAM_g_stEngineStructure.stFixViewportAttr)
 
 extern void __cdecl GEO_fn_vComputeCameraParametersForCulling(void *, float);
+
+void __cdecl fn_vMakeCharacterReact(HIE_tdstSuperObject *p_stSuperObj)
+{
+    unsigned long              ulCurrentBits;
+    MS_tdxHandleToStandardGame hStdGame = M_GetMSHandle(p_stSuperObj, StandardGame);
+
+    ulCurrentBits = fn_ulStandardGameGetCustomBits(hStdGame);
+
+    if ((ulCurrentBits & (GAM_C_CustBitUnseenFrozen | GAM_C_CustBitOutOfVisibility))
+        != (GAM_C_CustBitUnseenFrozen | GAM_C_CustBitOutOfVisibility))
+    {
+
+        if (!((ulCurrentBits & GAM_C_CustBitNoAI)
+              || ((ulCurrentBits & GAM_C_CustBitNoAIWhenTooFar)
+                  && fn_bStandardGameIsTooFar(hStdGame))))
+        {
+            fn_vMakeCharacterThink(p_stSuperObj);
+
+            if ((hStdGame = M_GetMSHandle(p_stSuperObj, StandardGame)) != NULL)
+                ulCurrentBits = fn_ulStandardGameGetCustomBits(hStdGame);
+        }
+
+        if (hStdGame
+            && !((ulCurrentBits & GAM_C_CustBitNoMechanic)
+                 || ((ulCurrentBits & GAM_C_CustBitNoMecaWhenTooFar)
+                     && fn_bStandardGameIsTooFar(hStdGame))))
+        {
+            fn_vMakeCharacterMechanicallyReact(p_stSuperObj);
+        }
+    }
+}
 void fn_vDisplayFix(void)
 {
 
@@ -970,49 +1001,9 @@ void fn_vDisplayFix(void)
     }
 }
 
-void __cdecl fn_vMakeCharacterReact(HIE_tdstSuperObject *p_stSuperObj)
-{
-    unsigned long              ulCurrentBits;
-    MS_tdxHandleToStandardGame hStdGame = M_GetMSHandle(p_stSuperObj, StandardGame);
-
-    ulCurrentBits = fn_ulStandardGameGetCustomBits(hStdGame);
-
-    if ((ulCurrentBits & (GAM_C_CustBitUnseenFrozen | GAM_C_CustBitOutOfVisibility))
-        != (GAM_C_CustBitUnseenFrozen | GAM_C_CustBitOutOfVisibility))
-    {
-
-        if (!((ulCurrentBits & GAM_C_CustBitNoAI)
-              || ((ulCurrentBits & GAM_C_CustBitNoAIWhenTooFar)
-                  && fn_bStandardGameIsTooFar(hStdGame))))
-        {
-            fn_vMakeCharacterThink(p_stSuperObj);
-
-            if ((hStdGame = M_GetMSHandle(p_stSuperObj, StandardGame)) != NULL)
-                ulCurrentBits = fn_ulStandardGameGetCustomBits(hStdGame);
-        }
-
-        if (hStdGame
-            && !((ulCurrentBits & GAM_C_CustBitNoMechanic)
-                 || ((ulCurrentBits & GAM_C_CustBitNoMecaWhenTooFar)
-                     && fn_bStandardGameIsTooFar(hStdGame))))
-        {
-            fn_vMakeCharacterMechanicallyReact(p_stSuperObj);
-        }
-    }
-}
-
 #define GAM_M_GetEngineObjectOfActor(p_stSuperObject) \
     ((((p_stSuperObject)->ulTypeOfLinkedObject) != HIE_C_ulActor) ? NULL : \
      ((struct tdstEngineObject_ *)(HIE_fn_hGetSuperObjectObject(p_stSuperObject))))
-
-unsigned char __cdecl GAM_fn_bIsCharacterActive(HIE_tdstSuperObject *hSuperObj)
-{
-    return (unsigned char)
-           ( ((HIE_fn_hGetSuperObjectFather(hSuperObj)==gp_stDynamicWorld) ||
-              (HIE_fn_hGetSuperObjectFather(HIE_fn_hGetSuperObjectFather(hSuperObj))==gp_stDynamicWorld))
-             && (fn_bf1StandardGameGetIsActive(GAM_M_GetEngineObjectOfActor(hSuperObj)->h_StandardGame)==1)
-           );
-}
 
 static long GAM_fn_lGetNbPersoActivableInSector(HIE_tdstSuperObject *hSector)
 {
@@ -1048,4 +1039,13 @@ long __cdecl GAM_fn_lGetNbPersoActive(void)
     }
 
     return lNbPerso;
+}
+
+unsigned char __cdecl GAM_fn_bIsCharacterActive(HIE_tdstSuperObject *hSuperObj)
+{
+    return (unsigned char)
+           ( ((HIE_fn_hGetSuperObjectFather(hSuperObj)==gp_stDynamicWorld) ||
+              (HIE_fn_hGetSuperObjectFather(HIE_fn_hGetSuperObjectFather(hSuperObj))==gp_stDynamicWorld))
+             && (fn_bf1StandardGameGetIsActive(GAM_M_GetEngineObjectOfActor(hSuperObj)->h_StandardGame)==1)
+           );
 }

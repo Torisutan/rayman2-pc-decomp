@@ -58,117 +58,10 @@ static unsigned int gam_lcg_step(unsigned int seed)
 extern void __cdecl MMG_pc_fn_vInstallTableDsgVars(AI_tdstMind *p_stMind);
 extern void __cdecl MMG_pc_fn_vRunTamperCodeBlock(AI_tdstMind *volatile p_stMind);
 
-void __cdecl GAM_pc_fn_vProtectFlaggedObjects(int _bSkipTamper)
-{
-    ALW_tdxHandleToModelList hModel;
-    HIE_tdstSuperObject *p_stChild;
-    struct tdstEngineObject_ *p_stObj;
-    MS_tdxHandleToStandardGame hStdGame;
-    MS_tdxHandleToBrain hBrain;
-    AI_tdstMind *p_stMind;
-
-    hModel = LST2_M_DynamicGetFirstElement(&g_stAlways.ALW_h_LstAlwaysModel);
-    while (hModel != NULL)
-    {
-        p_stObj = hModel->p_stAlwaysObject;
-        hStdGame = p_stObj->h_StandardGame;
-        if (hStdGame != NULL && (hStdGame->ulCustomBits & GAM_C_CustBitProtection) != 0)
-        {
-            hBrain = (MS_tdxHandleToBrain)p_stObj->h_Brain;
-            if (hBrain != NULL)
-            {
-                p_stMind = hBrain->p_stMind;
-                if (p_stMind != NULL && _bSkipTamper == 0)
-                {
-                    MMG_pc_fn_vInstallTableDsgVars(p_stMind);
-                    MMG_pc_fn_vRunTamperCodeBlock(p_stMind);
-                }
-            }
-        }
-        hModel = LST2_M_DynamicGetNextElement(hModel);
-    }
-
-    p_stChild = gp_stDynamicWorld->p_stFirstChild;
-    while (p_stChild != NULL)
-    {
-        p_stObj = (struct tdstEngineObject_ *)p_stChild->hLinkedObject.p_Void;
-        hStdGame = p_stObj->h_StandardGame;
-        if (hStdGame != NULL && (hStdGame->ulCustomBits & GAM_C_CustBitProtection) != 0)
-        {
-            hBrain = (MS_tdxHandleToBrain)p_stObj->h_Brain;
-            if (hBrain != NULL)
-            {
-                p_stMind = hBrain->p_stMind;
-                if (p_stMind != NULL && _bSkipTamper == 0)
-                {
-                    MMG_pc_fn_vInstallTableDsgVars(p_stMind);
-                    MMG_pc_fn_vRunTamperCodeBlock(p_stMind);
-                }
-            }
-        }
-        p_stChild = p_stChild->p_stNextBrother;
-    }
-}
-
-void __cdecl GAM_pc_fn_vReseedLoadTables(void)
-{
-    unsigned long ulCount;
-    unsigned long ulIdx;
-    unsigned int  uState;
-    unsigned int  uKey;
-    unsigned int  uS;
-
-    GAM_pc_fn_vProtectFlaggedObjects(0);
-
-    ulCount = SNA_g_ulTableIndex;
-    ulIdx   = 0;
-    if (ulCount <= 0)
-        return;
-    uState  = MMG_g_ulLCGState;
-    do
-    {
-
-        uS   = uState ^ 0x75bd924u;
-        uKey = uS * 0x41a7u + (unsigned int)((int)uS / 0x1f31d * -0x7fffffff);
-        if ((int)uKey < 0)
-            uKey += 0x7fffffffu;
-        SNA_pc_g_a_ulTableKey[ulIdx] = uKey;
-
-        uS     = uKey ^ 0x75bd924u;
-        uState = uS * 0x41a7u + (unsigned int)((int)uS / 0x1f31d * -0x7fffffff);
-        if ((int)uState < 0)
-            uState += 0x7fffffffu;
-        SNA_pc_g_a_ulTableState[ulIdx] = uState;
-    } while (++ulIdx < ulCount);
-    MMG_g_ulLCGState = uState;
-}
-
-/* 0x0044DBE0 */
-unsigned char __cdecl GAM_pc_fn_ucFindLevelNameIndex(char *szName)
-{
-    unsigned int uLen;
-    unsigned int uIdx;
-
-    uIdx = GAM_g_stEngineStructure.ucNumberOfLevels;
-    uLen = strlen(szName);
-    while (uIdx--)
-    {
-        if (_strnicmp(szName, GAM_g_stEngineStructure.a_szLevelName[uIdx], uLen) == 0)
-            return (unsigned char)uIdx;
-    }
-    return 0xff;
-}
-
 /* 0x00412020 */
 extern HIE_tdstSuperObject *g_hCharacterLauchingSoundEvents;
 extern void __cdecl DNM_p_stDynamicsCameraMechanics(void);
 extern void __cdecl MEC_p_stDynamicsBaseMechanics(void);
-
-void __cdecl InitArrayOfDynamicFunction(void **p_pfnRecord)
-{
-    p_pfnRecord[0] = (void *)DNM_p_stDynamicsCameraMechanics;
-    p_pfnRecord[1] = (void *)MEC_p_stDynamicsBaseMechanics;
-}
 
 /* 0x004B7300 */
 extern unsigned long GAM_pc_g_ulNbFixObject_storage;
@@ -199,29 +92,6 @@ static void gam_drm_rekey_reloc_table(void)
 
 /* 0x004A1FB4 */
 static long GAM_pc_g_lLevelLoadFlag = 1;
-
-/* 0x0044ADB0 */
-void __cdecl GAM_pc_fn_vSetLevelLoadFlag(void)
-{
-    GAM_pc_g_lLevelLoadFlag = 1;
-}
-
-/* 0x00412BA0 */
-unsigned int __cdecl GAM_pc_fn_ulFindMapLinkPos(unsigned int ulSubMap, unsigned int ulEntry)
-{
-    unsigned int ulKey;
-    unsigned int *pulNode;
-
-    ulKey = (ulEntry & 0x0000FFFF) + (ulSubMap << 16);
-    pulNode = (unsigned int *)GAM_pc_g_ulMapLinkPosListHead;
-    while (pulNode != 0)
-    {
-        if (pulNode[0] == ulKey)
-            return pulNode[1];
-        pulNode = (unsigned int *)pulNode[2];
-    }
-    return 0;
-}
 
 #include "GAM/a3x_mem.h"
 #include "GLD/GLD_Pub.h"
@@ -254,6 +124,11 @@ extern void __cdecl IPT_fn_vActivateAllEntryElements(void);
 extern void __cdecl AGO_vInit(void);
 extern void __cdecl GLI_pc_fn_vReadIniString(const char *, const char *, unsigned long, char *);
 extern void __cdecl GLD_pc_fn_vRestartFrameTimer(void);
+
+void __cdecl GAM_pc_fn_vReseedLoadTables(void);
+unsigned char __cdecl GAM_pc_fn_ucFindLevelNameIndex(char *szName);
+void __cdecl InitArrayOfDynamicFunction(void **p_pfnRecord);
+void __cdecl GAM_pc_fn_vSetLevelLoadFlag(void);
 void fn_vInitLevelLoop(void)
 {
 
@@ -263,7 +138,7 @@ void fn_vInitLevelLoop(void)
     void          (__cdecl *SNA_vReadRawArray)(void *, int, unsigned int)= SNA_pc_vReadRawArray;
     void          (__cdecl *SNA_vCloseGptFile)(void)                    = SNA_pc_vCloseGptFile;
     void          (__cdecl *SNA_vOpenSndFile)(char *)                   = SNA_pc_vOpenSndFile;
-    void          (__cdecl *SNA_vReadAndRelocateSnd)(void)             = SNA_pc_vReadAndRelocateSnd;
+    void          (__cdecl *SNA_vReadAndRelocateSnd)(char *)           = SNA_pc_vReadAndRelocateSnd;
 
     char  szPath480[260];
     char  szPath208[260];
@@ -587,7 +462,7 @@ void fn_vInitLevelLoop(void)
             sprintf(szPath480, GAM_LL_szSndPathFmt, pb, p2, p1);
         }
         SNA_vOpenSndFile(szPath480);
-        SNA_vReadAndRelocateSnd();
+        SNA_vReadAndRelocateSnd(szPath480);
 
         if (FUN_00418960() != 0)
             gam_drm_rekey_reloc_table();
@@ -658,4 +533,112 @@ void fn_vInitLevelLoop(void)
         GAM_g_ucCurrentLanguage = (unsigned char)iIndex;
     }
     GLD_pc_fn_vRestartFrameTimer();
+}
+
+void __cdecl GAM_pc_fn_vProtectFlaggedObjects(int _bSkipTamper)
+{
+    ALW_tdxHandleToModelList hModel;
+    HIE_tdstSuperObject *p_stChild;
+    struct tdstEngineObject_ *p_stObj;
+    MS_tdxHandleToStandardGame hStdGame;
+    MS_tdxHandleToBrain hBrain;
+    AI_tdstMind *p_stMind;
+
+    hModel = LST2_M_DynamicGetFirstElement(&g_stAlways.ALW_h_LstAlwaysModel);
+    while (hModel != NULL)
+    {
+        p_stObj = hModel->p_stAlwaysObject;
+        hStdGame = p_stObj->h_StandardGame;
+        if (hStdGame != NULL && (hStdGame->ulCustomBits & GAM_C_CustBitProtection) != 0)
+        {
+            hBrain = (MS_tdxHandleToBrain)p_stObj->h_Brain;
+            if (hBrain != NULL)
+            {
+                p_stMind = hBrain->p_stMind;
+                if (p_stMind != NULL && _bSkipTamper == 0)
+                {
+                    MMG_pc_fn_vInstallTableDsgVars(p_stMind);
+                    MMG_pc_fn_vRunTamperCodeBlock(p_stMind);
+                }
+            }
+        }
+        hModel = LST2_M_DynamicGetNextElement(hModel);
+    }
+
+    p_stChild = gp_stDynamicWorld->p_stFirstChild;
+    while (p_stChild != NULL)
+    {
+        p_stObj = (struct tdstEngineObject_ *)p_stChild->hLinkedObject.p_Void;
+        hStdGame = p_stObj->h_StandardGame;
+        if (hStdGame != NULL && (hStdGame->ulCustomBits & GAM_C_CustBitProtection) != 0)
+        {
+            hBrain = (MS_tdxHandleToBrain)p_stObj->h_Brain;
+            if (hBrain != NULL)
+            {
+                p_stMind = hBrain->p_stMind;
+                if (p_stMind != NULL && _bSkipTamper == 0)
+                {
+                    MMG_pc_fn_vInstallTableDsgVars(p_stMind);
+                    MMG_pc_fn_vRunTamperCodeBlock(p_stMind);
+                }
+            }
+        }
+        p_stChild = p_stChild->p_stNextBrother;
+    }
+}
+
+void __cdecl GAM_pc_fn_vReseedLoadTables(void)
+{
+    unsigned long ulCount;
+    unsigned long ulIdx;
+    unsigned int  uState;
+    unsigned int  uKey;
+    unsigned int  uS;
+
+    GAM_pc_fn_vProtectFlaggedObjects(0);
+
+    ulCount = SNA_g_ulTableIndex;
+    ulIdx   = 0;
+    if (ulCount <= 0)
+        return;
+    uState  = MMG_g_ulLCGState;
+    do
+    {
+
+        uS   = uState ^ 0x75bd924u;
+        uKey = uS * 0x41a7u + (unsigned int)((int)uS / 0x1f31d * -0x7fffffff);
+        if ((int)uKey < 0)
+            uKey += 0x7fffffffu;
+        SNA_pc_g_a_ulTableKey[ulIdx] = uKey;
+
+        uS     = uKey ^ 0x75bd924u;
+        uState = uS * 0x41a7u + (unsigned int)((int)uS / 0x1f31d * -0x7fffffff);
+        if ((int)uState < 0)
+            uState += 0x7fffffffu;
+        SNA_pc_g_a_ulTableState[ulIdx] = uState;
+    } while (++ulIdx < ulCount);
+    MMG_g_ulLCGState = uState;
+}
+
+/* 0x00412BA0 */
+unsigned int __cdecl GAM_pc_fn_ulFindMapLinkPos(unsigned int ulSubMap, unsigned int ulEntry)
+{
+    unsigned int ulKey;
+    unsigned int *pulNode;
+
+    ulKey = (ulEntry & 0x0000FFFF) + (ulSubMap << 16);
+    pulNode = (unsigned int *)GAM_pc_g_ulMapLinkPosListHead;
+    while (pulNode != 0)
+    {
+        if (pulNode[0] == ulKey)
+            return pulNode[1];
+        pulNode = (unsigned int *)pulNode[2];
+    }
+    return 0;
+}
+
+/* 0x0044ADB0 */
+void __cdecl GAM_pc_fn_vSetLevelLoadFlag(void)
+{
+    GAM_pc_g_lLevelLoadFlag = 1;
 }

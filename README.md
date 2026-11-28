@@ -6,30 +6,30 @@ MD5 `ef4954015d8b67e3534c9dc40ca3ad6e`). The goal is C source that rebuilds a **
 
 ## Status
 
-**`Rayman2.exe`**: the census of the retail code section (0x00401000..0x0049C000, 2026-11-27) finds **3166 functions**. 65 are library code (C runtime, import thunks) that the linker supplies; the other **3101 are game code, and all of them have C source**. **2687 are byte-exact** (86.6%; 60% of the 595,410 bytes of game code) and 414 are not yet.
+**`Rayman2.exe`**: the census of the retail code section (0x00401000..0x0049C000, 2026-11-28) finds **3166 functions**. 65 are library code (C runtime, import thunks) that the linker supplies; the other **3101 are game code, and all of them have C source**. **2706 are byte-exact** (87.3%; 62% of the 595,461 bytes of game code) and 395 are not yet.
 
 The source holds 3267 C functions (`Rayman2.exe/status.json`): where the linker folded identical functions into one retail function, each C function is listed with that address.
 
 | Module | Functions | Byte-exact |
 |---|---:|---:|
-| GAM | 743 | 687 |
-| AI | 703 | 660 |
+| GAM | 749 | 697 |
+| AI | 704 | 671 |
 | SND | 417 | 405 |
-| GLI | 344 | 248 |
-| MEC | 117 | 88 |
-| MMG | 91 | 51 |
+| GLI | 341 | 247 |
+| MEC | 117 | 89 |
+| MMG | 93 | 53 |
 | IPT | 86 | 74 |
-| GEO | 81 | 71 |
-| SAI | 68 | 64 |
-| HIE | 67 | 48 |
+| GEO | 81 | 72 |
+| SAI | 68 | 65 |
+| HIE | 67 | 49 |
 | AGO | 52 | 26 |
 | INO | 45 | 30 |
-| FIL | 42 | 30 |
-| MGT | 39 | 28 |
-| COL | 34 | 31 |
+| FIL | 44 | 31 |
+| MGT | 34 | 23 |
+| COL | 31 | 28 |
 | POS | 30 | 30 |
 | INT | 29 | 23 |
-| SCT | 28 | 22 |
+| SCT | 29 | 23 |
 | GMT | 17 | 17 |
 | MOR | 15 | 8 |
 | MTH | 11 | 7 |
@@ -37,7 +37,7 @@ The source holds 3267 C functions (`Rayman2.exe/status.json`): where the linker 
 | ERM | 8 | 8 |
 | RND | 7 | 7 |
 | TMR | 7 | 7 |
-| DNM | 6 | 6 |
+| DNM | 5 | 5 |
 | FON | 3 | 3 |
 | PIC | 1 | 1 |
 | SPO | 1 | 1 |

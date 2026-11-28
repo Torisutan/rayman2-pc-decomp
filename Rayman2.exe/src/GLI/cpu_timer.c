@@ -10,6 +10,59 @@
 
 __declspec(dllimport) DWORD __stdcall timeGetTime(void);
 
+short __cdecl TMR_fn_wInitLibrary(void)
+{
+
+    if (*(unsigned short *)&g_bTMRInited != 0) {
+        return 0;
+    }
+
+    memset(TMR_a_stTimerTab, 0, 576);
+
+    *TMR_g_p_wTimerCount = 0;
+
+    TMR_a3_ulTimerFrequency[0] = fn_ulTimerTickPerSecond(0);   /* 0x0045E8A0 */
+    TMR_a3_ulTimerFrequency[1] = fn_ulTimerTickPerSecond(1);
+    TMR_a3_ulTimerFrequency[2] = fn_ulTimerTickPerSecond(2);
+
+    a3_ulEventFrequency[0] = fn_ulTimerEventTickPerSecond(0);
+    a3_ulEventFrequency[1] = fn_ulTimerEventTickPerSecond(1);
+    a3_ulEventFrequency[2] = fn_ulTimerEventTickPerSecond(2);
+
+    if (TMR_pc_g_bCpuFeaturesInited == 0) {
+        if (TMR_pc_g_ucExternalSvcId == 0xff) {
+            TMR_pc_g_ucExternalSvcId = (unsigned char)Erm_fn_ucInitErrMsg();   /* 0x004025D0 */
+        }
+        TMR_pc_g_bCpuFeaturesInited = 1;
+    }
+
+    ++*(unsigned short *)&g_bTMRInited;
+    return 0;
+}
+
+unsigned long __cdecl fn_ulTimerTickPerSecond(short sChannel)
+{
+    int iCh = (int)sChannel;
+    LARGE_INTEGER liFreq;
+    BOOL bOk;
+
+    switch (iCh) {
+    case 2:
+        if (TMR_pc_fn_bIsTscUsableForVendor() != 0) {
+            return TMR_pc_fn_ulCalibrateTscFreq();
+        }
+        return 0ul;
+    case 1:
+        bOk = QueryPerformanceFrequency(&liFreq);
+        return (bOk == 1) ? (unsigned long)liFreq.LowPart : 0ul;
+    case 0:
+        TMR_pc_fn_vSetupTimerPeriod();
+        return 1000ul;
+    default:
+        return 0ul;
+    }
+}
+
 unsigned long __cdecl fn_ulTimerEventTickPerSecond(short channel)
 {
     unsigned long ulFreq;
@@ -167,57 +220,4 @@ int __cdecl TMR_pc_fn_bIsTscUsableForVendor(void)
     default:
         return 0;
     }
-}
-
-unsigned long __cdecl fn_ulTimerTickPerSecond(short sChannel)
-{
-    int iCh = (int)sChannel;
-    LARGE_INTEGER liFreq;
-    BOOL bOk;
-
-    switch (iCh) {
-    case 2:
-        if (TMR_pc_fn_bIsTscUsableForVendor() != 0) {
-            return TMR_pc_fn_ulCalibrateTscFreq();
-        }
-        return 0ul;
-    case 1:
-        bOk = QueryPerformanceFrequency(&liFreq);
-        return (bOk == 1) ? (unsigned long)liFreq.LowPart : 0ul;
-    case 0:
-        TMR_pc_fn_vSetupTimerPeriod();
-        return 1000ul;
-    default:
-        return 0ul;
-    }
-}
-
-short __cdecl TMR_fn_wInitLibrary(void)
-{
-
-    if (*(unsigned short *)&g_bTMRInited != 0) {
-        return 0;
-    }
-
-    memset(TMR_a_stTimerTab, 0, 576);
-
-    *TMR_g_p_wTimerCount = 0;
-
-    TMR_a3_ulTimerFrequency[0] = fn_ulTimerTickPerSecond(0);   /* 0x0045E8A0 */
-    TMR_a3_ulTimerFrequency[1] = fn_ulTimerTickPerSecond(1);
-    TMR_a3_ulTimerFrequency[2] = fn_ulTimerTickPerSecond(2);
-
-    a3_ulEventFrequency[0] = fn_ulTimerEventTickPerSecond(0);
-    a3_ulEventFrequency[1] = fn_ulTimerEventTickPerSecond(1);
-    a3_ulEventFrequency[2] = fn_ulTimerEventTickPerSecond(2);
-
-    if (TMR_pc_g_bCpuFeaturesInited == 0) {
-        if (TMR_pc_g_ucExternalSvcId == 0xff) {
-            TMR_pc_g_ucExternalSvcId = (unsigned char)Erm_fn_ucInitErrMsg();   /* 0x004025D0 */
-        }
-        TMR_pc_g_bCpuFeaturesInited = 1;
-    }
-
-    ++*(unsigned short *)&g_bTMRInited;
-    return 0;
 }
